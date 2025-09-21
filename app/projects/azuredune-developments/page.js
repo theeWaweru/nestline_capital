@@ -486,9 +486,9 @@ export default function AzureDune_Developments() {
                             to secure the ultimate beachfront investment
                             opportunity. With direct access to pristine Indian
                             Ocean shores and unobstructed sea views, your
-                            investment will capture Malindi's most exclusive
-                            coastal position. With detailed planning underway,
-                            your oceanfront legacy awaits.
+                            investment will capture Malindi&apos;s most
+                            exclusive coastal position. With detailed planning
+                            underway, your oceanfront legacy awaits.
                           </p>
                         </div>
                       </div>

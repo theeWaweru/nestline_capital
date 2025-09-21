@@ -33,7 +33,8 @@ export default function Services() {
                   id="w-node-c402ff5c-ff3d-ba1c-fb40-50b8b3b83d0f-90e1fcbd"
                   className="basic-hero-side"
                 >
-                  <Image fill
+                  <Image
+                    fill
                     src="/images/Malindi-5.webp"
                     loading="lazy"
                     alt=""
@@ -280,7 +281,8 @@ export default function Services() {
                       id="w-node-_02dd7956-2ad2-a067-fbd9-4781a67fbe5f-90e1fcbd"
                       className="service-hero-image"
                     >
-                      <Image fill
+                      <Image
+                        fill
                         src="/images/Malindi-5.webp"
                         loading="lazy"
                         alt=""
@@ -695,7 +697,8 @@ export default function Services() {
                       className="service-item-image"
                     >
                       <div className="service-image-height" />
-                      <Image fill
+                      <Image
+                        fill
                         src="/images/Malindi-5.webp"
                         loading="lazy"
                         alt=""
@@ -713,11 +716,11 @@ export default function Services() {
                       </div>
                       <div className="service-card-description">
                         <p className="text-size-regular text-color-grey">
-                          Led by expertise from local market specialists, you'll
-                          learn about all aspects of coastal investment -- from
-                          location analysis and growth potential, to
-                          infrastructure development that makes each opportunity
-                          unique.
+                          Led by expertise from local market specialists,
+                          you&apos;ll learn about all aspects of coastal
+                          investment -- from location analysis and growth
+                          potential, to infrastructure development that makes
+                          each opportunity unique.
                         </p>
                       </div>
                     </div>
@@ -743,7 +746,8 @@ export default function Services() {
                         </div>
                         <div className="clip">
                           <div className="button-icon">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -751,7 +755,8 @@ export default function Services() {
                             />
                           </div>
                           <div className="button-icon button-icon-bottom">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -773,7 +778,8 @@ export default function Services() {
                       className="service-item-image"
                     >
                       <div className="service-image-height" />
-                      <Image fill
+                      <Image
+                        fill
                         src="/images/Malindi-2.webp"
                         loading="lazy"
                         alt=""
@@ -821,7 +827,8 @@ export default function Services() {
                         </div>
                         <div className="clip">
                           <div className="button-icon">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -829,7 +836,8 @@ export default function Services() {
                             />
                           </div>
                           <div className="button-icon button-icon-bottom">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -851,7 +859,8 @@ export default function Services() {
                       className="service-item-image"
                     >
                       <div className="service-image-height" />
-                      <Image fill
+                      <Image
+                        fill
                         src="/images/Malindi-5.webp"
                         loading="lazy"
                         alt=""
@@ -897,7 +906,8 @@ export default function Services() {
                         </div>
                         <div className="clip">
                           <div className="button-icon">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -905,7 +915,8 @@ export default function Services() {
                             />
                           </div>
                           <div className="button-icon button-icon-bottom">
-                            <Image fill
+                            <Image
+                              fill
                               src="/images/Right-arrow-slant---dark.svg"
                               loading="lazy"
                               alt=""
@@ -982,7 +993,8 @@ export default function Services() {
                                 id="w-node-fe094dee-8713-2384-fbe1-928a3b16ae24-3b16ae17"
                                 className="service-tab-icon"
                               >
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Icon-close-reg.svg"
                                   loading="lazy"
                                   alt=""
@@ -1050,7 +1062,8 @@ export default function Services() {
                                 id="w-node-fe094dee-8713-2384-fbe1-928a3b16ae24-3b16ae17"
                                 className="service-tab-icon"
                               >
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Icon-close-reg.svg"
                                   loading="lazy"
                                   alt=""
@@ -1119,7 +1132,8 @@ export default function Services() {
                                 id="w-node-fe094dee-8713-2384-fbe1-928a3b16ae24-3b16ae17"
                                 className="service-tab-icon"
                               >
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Icon-close-reg.svg"
                                   loading="lazy"
                                   alt=""
@@ -1141,7 +1155,7 @@ export default function Services() {
                                   appreciated 18-25% annually. While we cannot
                                   guarantee returns, our strategic location
                                   selection and timing aim to capture optimal
-                                  growth potential in Malindi's expanding
+                                  growth potential in Malindi&apos;s expanding
                                   market.
                                 </p>
                               </div>
@@ -1188,7 +1202,8 @@ export default function Services() {
                                 id="w-node-fe094dee-8713-2384-fbe1-928a3b16ae24-3b16ae17"
                                 className="service-tab-icon"
                               >
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Icon-close-reg.svg"
                                   loading="lazy"
                                   alt=""
@@ -1230,7 +1245,8 @@ export default function Services() {
               className="call-center"
             >
               <div className="featured-background">
-                <Image fill
+                <Image
+                  fill
                   src="/images/Malindi-3.webp"
                   loading="lazy"
                   sizes="100vw"
@@ -1626,7 +1642,8 @@ export default function Services() {
                             </div>
                             <div className="clip">
                               <div className="button-icon">
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Right-arrow-slant---dark.svg"
                                   loading="lazy"
                                   alt=""
@@ -1634,7 +1651,8 @@ export default function Services() {
                                 />
                               </div>
                               <div className="button-icon button-icon-bottom">
-                                <Image fill
+                                <Image
+                                  fill
                                   src="/images/Right-arrow-slant---dark.svg"
                                   loading="lazy"
                                   alt=""

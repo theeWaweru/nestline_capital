@@ -125,14 +125,14 @@ export default function ProjectTemplate() {
                         <div>
                           <p className="text-size-regular dual-paragraph text-color-grey">
                             Our beachfront opportunity allows investors to
-                            experience what it's like to own premium coastal
-                            property with direct ocean access. With our
-                            strategic positioning, located during Malindi's peak
-                            development period, your investment can appreciate
-                            over stunning seascapes as far back as an eye can
-                            see. With expert site selection and transparent
-                            processes, your wealth-building journey will create
-                            an unforgettable legacy.
+                            experience what it&apos;s like to own premium
+                            coastal property with direct ocean access. With our
+                            strategic positioning, located during Malindi&apos;s
+                            peak development period, your investment can
+                            appreciate over stunning seascapes as far back as an
+                            eye can see. With expert site selection and
+                            transparent processes, your wealth-building journey
+                            will create an unforgettable legacy.
                           </p>
                         </div>
                       </div>

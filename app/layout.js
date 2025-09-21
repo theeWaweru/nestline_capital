@@ -5,6 +5,7 @@ import "./globals.css";
 import "./nestline.css";
 import Footer from "./components/footer";
 import Menu from "./components/menu";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +34,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <GoogleAnalytics gaId="G-8E5CBZB7X6" />
         <script
-          src="/jquery.js"
-          type="text/javascript"
-          integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-          crossOrigin="anonymous"
-          async
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-8E5CBZB7X6');
+          `,
+          }}
         />
+        <script src="/jquery.js" async></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
