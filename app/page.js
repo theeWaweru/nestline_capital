@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import SplitText from "./animations/split_text";
+import GlobalButton from "./components/button";
 
 const handleAnimationComplete = () => {
   console.log("All letters have animated!");
@@ -29,7 +30,7 @@ export default function Home() {
                     fill
                     src="/images/Malindi-5.webp"
                     loading="lazy"
-                    alt="WeVenue reception area"
+                    alt="Nestline Capital - image of malindi"
                     className="image-fill"
                   />
                 </div>
@@ -150,6 +151,10 @@ export default function Home() {
                             Kenya&apos;s growth story.
                           </p>
                         </div>
+                        <GlobalButton>Explore</GlobalButton>
+                        <GlobalButton hoverBg="bg-blue-600">
+                          Get Started
+                        </GlobalButton>
                         <a
                           href="contact.html"
                           className="button is-icon w-inline-block"
@@ -169,7 +174,8 @@ export default function Home() {
                           <div className="clip">
                             <div className="button-icon">
                               <Image
-                                fill
+                                width={24}
+                                height={24}
                                 src="/images/Right-arrow-slant---dark.svg"
                                 loading="lazy"
                                 alt=""
@@ -178,7 +184,8 @@ export default function Home() {
                             </div>
                             <div className="button-icon button-icon-bottom">
                               <Image
-                                fill
+                                width={24}
+                                height={24}
                                 src="/images/Right-arrow-slant---dark.svg"
                                 loading="lazy"
                                 alt=""
