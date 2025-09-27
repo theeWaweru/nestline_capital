@@ -34,3 +34,34 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## File Structure After Integration
+nestline_capital/
+├── app/
+│   ├── admin/                    # NEW - Admin Dashboard
+│   │   ├── page.js              # Admin login page (JS)
+│   │   └── dashboard/
+│   │       └── page.js          # Main admin dashboard (JS)
+│   ├── api/                     # NEW - Backend API Routes
+│   │   ├── projects/
+│   │   ├── plots/
+│   │   ├── quotes/
+│   │   └── settings/
+│   ├── components/              # NEW - Shared Components
+│   │   ├── ui/                  # UI components
+│   │   └── admin/               # Admin-specific components
+│   ├── lib/                     # NEW - Backend Logic
+│   │   ├── database.js
+│   │   ├── models/
+│   │   ├── email.js
+│   │   └── utils.js
+│   ├── projects/                # EXISTING - Your current pages
+│   ├── services/                # EXISTING
+│   ├── about/                   # EXISTING
+│   ├── layout.js                # EXISTING - Updated with fonts
+│   ├── globals.css              # EXISTING - Enhanced with variables
+│   ├── nestline.css             # EXISTING
+│   ├── webflow.css              # EXISTING
+│   └── normalize.css            # EXISTING
+├── package.json                 # EXISTING - Updated dependencies
+└── .env.local                   # NEW - Environment variables
