@@ -1,697 +1,300 @@
-// app/admin/dashboard/page.js
+// =============================================================================
+// 6. app/admin/dashboard/page.js - Enhanced dashboard with real data
+// =============================================================================
 "use client";
 
 import { useState, useEffect } from "react";
+import Sidebar from "@/components/admin/Sidebar";
+import Header from "@/components/admin/Header";
+import StatsCard from "@/components/admin/StatsCard";
+// import GoogleMap from "@/components/maps/GoogleMap";
+
 
 export default function AdminDashboard() {
-  const [currentView, setCurrentView] = useState("dashboard");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState("");
-
-  // Data states
-  const [projects, setProjects] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [stats, setStats] = useState(null);
   const [plots, setPlots] = useState([]);
-  const [quoteRequests, setQuoteRequests] = useState([]);
-  const [stats, setStats] = useState({
-    totalProjects: 0,
-    totalPlots: 0,
-    totalQuotes: 0,
-    pendingQuotes: 0,
-    revenuePotential: 0,
-  });
+  const [loading, setLoading] = useState(true);
 
-  // Loading states
-  const [loading, setLoading] = useState({
-    projects: true,
-    plots: true,
-    quotes: true,
-    stats: true,
-  });
-
-  // Error states
-  const [errors, setErrors] = useState({});
-
-  const menuItems = [
-    { key: "dashboard", label: "Dashboard", icon: "📊" },
-    { key: "projects", label: "Projects", icon: "🏢" },
-    { key: "plots", label: "Plot Management", icon: "📍" },
-    { key: "quotes", label: "Quote Requests", icon: "💬" },
-    { key: "users", label: "Users", icon: "👥" },
-    { key: "settings", label: "Settings", icon: "⚙️" },
-  ];
-
-  // API calls
-  const fetchProjects = async () => {
-    try {
-      setLoading((prev) => ({ ...prev, projects: true }));
-      const response = await fetch("/api/projects");
-      if (!response.ok) throw new Error("Failed to fetch projects");
-      const data = await response.json();
-      setProjects(data);
-      setErrors((prev) => ({ ...prev, projects: null }));
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      setErrors((prev) => ({ ...prev, projects: error.message }));
-    } finally {
-      setLoading((prev) => ({ ...prev, projects: false }));
-    }
-  };
-
-  const fetchPlots = async (projectId = "") => {
-    try {
-      setLoading((prev) => ({ ...prev, plots: true }));
-      const url = projectId
-        ? `/api/plots?projectId=${projectId}`
-        : "/api/plots";
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch plots");
-      const data = await response.json();
-      setPlots(data);
-      setErrors((prev) => ({ ...prev, plots: null }));
-    } catch (error) {
-      console.error("Error fetching plots:", error);
-      setErrors((prev) => ({ ...prev, plots: error.message }));
-    } finally {
-      setLoading((prev) => ({ ...prev, plots: false }));
-    }
-  };
-
-  const fetchQuoteRequests = async () => {
-    try {
-      setLoading((prev) => ({ ...prev, quotes: true }));
-      const response = await fetch("/api/quotes");
-      if (!response.ok) throw new Error("Failed to fetch quote requests");
-      const data = await response.json();
-      setQuoteRequests(data);
-      setErrors((prev) => ({ ...prev, quotes: null }));
-    } catch (error) {
-      console.error("Error fetching quotes:", error);
-      setErrors((prev) => ({ ...prev, quotes: error.message }));
-    } finally {
-      setLoading((prev) => ({ ...prev, quotes: false }));
-    }
-  };
-
-  const calculateStats = () => {
-    const totalProjects = projects.length;
-    const totalPlots = plots.length;
-    const totalQuotes = quoteRequests.length;
-    const pendingQuotes = quoteRequests.filter(
-      (q) => q.status === "pending_verification"
-    ).length;
-    const revenuePotential = plots
-      .filter((p) => p.status === "available")
-      .reduce((sum, plot) => sum + (plot.price || 0), 0);
-
-    setStats({
-      totalProjects,
-      totalPlots,
-      totalQuotes,
-      pendingQuotes,
-      revenuePotential,
-    });
-  };
-
-  const confirmQuoteRequest = async (quoteId) => {
-    try {
-      const response = await fetch(`/api/quotes/${quoteId}/confirm`, {
-        method: "POST",
-      });
-      if (!response.ok) throw new Error("Failed to confirm quote");
-
-      // Refresh data
-      await fetchQuoteRequests();
-      await fetchPlots();
-      alert("Quote request confirmed successfully!");
-    } catch (error) {
-      console.error("Error confirming quote:", error);
-      alert("Failed to confirm quote request");
-    }
-  };
-
-  const rejectQuoteRequest = async (quoteId) => {
-    try {
-      const response = await fetch(`/api/quotes/${quoteId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to reject quote");
-
-      // Refresh data
-      await fetchQuoteRequests();
-      await fetchPlots();
-      alert("Quote request rejected successfully!");
-    } catch (error) {
-      console.error("Error rejecting quote:", error);
-      alert("Failed to reject quote request");
-    }
-  };
-
-  // Effects
+  // Fetch dashboard data
   useEffect(() => {
-    fetchProjects();
-    fetchQuoteRequests();
-    fetchPlots();
+    const fetchDashboardData = async () => {
+      try {
+        const [statsRes, plotsRes] = await Promise.all([
+          fetch("/api/analytics/dashboard"),
+          fetch("/api/plots"),
+        ]);
+
+        const statsData = await statsRes.json();
+        const plotsData = await plotsRes.json();
+
+        setStats(statsData);
+        setPlots(plotsData);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
-  useEffect(() => {
-    calculateStats();
-  }, [projects, plots, quoteRequests]);
-
-  useEffect(() => {
-    if (selectedProject) {
-      fetchPlots(selectedProject);
-    } else {
-      fetchPlots();
-    }
-  }, [selectedProject]);
-
-  const getStatusColor = (status) => {
-    const colors = {
-      available: "var(--success-500)",
-      requested: "var(--warning-500)",
-      confirmed: "var(--sage-500)",
-      sold: "var(--error-500)",
-      planning: "var(--text-muted)",
-      ready: "var(--success-500)",
-      verified: "var(--success-500)",
-      pending_verification: "var(--warning-500)",
-      expired: "var(--error-500)",
-    };
-    return colors[status] || "var(--text-muted)";
-  };
-
-  const formatPrice = (price) => {
-    return `KSh ${price.toLocaleString()}`;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  // Component definitions using CSS classes instead of inline styles
-  const StatusChip = ({ status, label }) => (
-    <span
-      className={`status-${status}`}
-      style={{
-        display: "inline-block",
-        backgroundColor: getStatusColor(status),
-        color: "white",
-        padding: "4px 12px",
-        borderRadius: "12px",
-        fontSize: "12px",
-        fontWeight: "500",
-        fontFamily: "var(--font-primary)",
-      }}
-    >
-      {label || status.replace("_", " ")}
-    </span>
-  );
-
-  const LoadingSpinner = () => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "40px",
-      }}
-    >
-      <div className="loading-spinner"></div>
-    </div>
-  );
-
-  const EmptyState = ({ title, message, actionLabel, onAction }) => (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "60px 20px",
-        color: "var(--text-muted)",
-      }}
-    >
-      <div style={{ fontSize: "48px", marginBottom: "16px" }}>📋</div>
-      <h3
-        style={{
-          fontSize: "18px",
-          marginBottom: "8px",
-          color: "var(--text-secondary)",
-          fontFamily: "var(--font-primary)",
-          fontWeight: "600",
-        }}
-      >
-        {title}
-      </h3>
-      <p
-        style={{
-          fontSize: "14px",
-          marginBottom: "24px",
-          fontFamily: "var(--font-primary)",
-        }}
-      >
-        {message}
-      </p>
-      {actionLabel && onAction && (
-        <button className="admin-button-primary" onClick={onAction}>
-          {actionLabel}
-        </button>
-      )}
-    </div>
-  );
-
-  const ErrorState = ({ message, onRetry }) => (
-    <div
-      style={{
-        textAlign: "center",
-        padding: "40px 20px",
-        color: "var(--error-500)",
-      }}
-    >
-      <div style={{ fontSize: "32px", marginBottom: "16px" }}>⚠️</div>
-      <p style={{ fontSize: "14px", marginBottom: "16px" }}>{message}</p>
-      {onRetry && (
-        <button className="admin-button-secondary" onClick={onRetry}>
-          Try Again
-        </button>
-      )}
-    </div>
-  );
-
-  const renderDashboard = () => (
-    <div>
-      <h2
-        style={{
-          marginBottom: "24px",
-          color: "var(--text-primary)",
-          fontFamily: "var(--font-geist-sans)",
-          fontWeight: "600",
-          fontSize: "32px",
-        }}
-      >
-        Dashboard Overview
-      </h2>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "20px",
-          marginBottom: "32px",
-        }}
-      >
-        <div className="admin-card" style={{ padding: "20px" }}>
-          <div
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "14px",
-              marginBottom: "8px",
-            }}
-          >
-            Total Projects
-          </div>
-          <div
-            style={{
-              fontSize: "36px",
-              fontWeight: "bold",
-              color: "var(--sage-600)",
-              fontFamily: "var(--font-geist-sans)",
-            }}
-          >
-            {stats.totalProjects}
-          </div>
-          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-            {projects.filter((p) => p.status === "ready").length} Active,{" "}
-            {projects.filter((p) => p.status === "planning").length} Planning
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: "20px" }}>
-          <div
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "14px",
-              marginBottom: "8px",
-            }}
-          >
-            Total Plots
-          </div>
-          <div
-            style={{
-              fontSize: "36px",
-              fontWeight: "bold",
-              color: "var(--success-500)",
-              fontFamily: "var(--font-geist-sans)",
-            }}
-          >
-            {stats.totalPlots}
-          </div>
-          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-            {plots.filter((p) => p.status === "available").length} Available for
-            sale
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: "20px" }}>
-          <div
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "14px",
-              marginBottom: "8px",
-            }}
-          >
-            Quote Requests
-          </div>
-          <div
-            style={{
-              fontSize: "36px",
-              fontWeight: "bold",
-              color: "var(--warning-500)",
-              fontFamily: "var(--font-geist-sans)",
-            }}
-          >
-            {stats.totalQuotes}
-          </div>
-          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-            {stats.pendingQuotes} Pending verification
-          </div>
-        </div>
-
-        <div className="admin-card" style={{ padding: "20px" }}>
-          <div
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "14px",
-              marginBottom: "8px",
-            }}
-          >
-            Revenue Potential
-          </div>
-          <div
-            style={{
-              fontSize: "36px",
-              fontWeight: "bold",
-              color: "var(--sage-700)",
-              fontFamily: "var(--font-geist-sans)",
-            }}
-          >
-            {stats.revenuePotential > 0
-              ? Math.round(stats.revenuePotential / 1000000) + "M"
-              : "0"}
-          </div>
-          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-            From available plots
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading-spinner"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
         </div>
       </div>
-
-      <div className="admin-card" style={{ padding: "20px" }}>
-        <h3
-          style={{
-            marginBottom: "20px",
-            color: "var(--text-primary)",
-            fontFamily: "var(--font-geist-sans)",
-            fontWeight: "600",
-          }}
-        >
-          Recent Quote Requests
-        </h3>
-
-        {loading.quotes ? (
-          <LoadingSpinner />
-        ) : errors.quotes ? (
-          <ErrorState message={errors.quotes} onRetry={fetchQuoteRequests} />
-        ) : quoteRequests.length === 0 ? (
-          <EmptyState
-            title="No Quote Requests"
-            message="No quote requests have been submitted yet. They will appear here once customers start requesting quotes."
-          />
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Email</th>
-                  <th>Plots</th>
-                  <th>Total Price</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quoteRequests.slice(0, 5).map((request) => (
-                  <tr key={request._id}>
-                    <td>{request.customerName}</td>
-                    <td>{request.email}</td>
-                    <td>{request.plotIds?.length || 0} plots</td>
-                    <td>{formatPrice(request.totalPrice)}</td>
-                    <td>
-                      <StatusChip status={request.status} />
-                    </td>
-                    <td>{formatDate(request.createdAt)}</td>
-                    <td>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <button
-                          className="admin-button-primary"
-                          style={{ fontSize: "12px", padding: "6px 12px" }}
-                          onClick={() => confirmQuoteRequest(request._id)}
-                          disabled={request.status !== "verified"}
-                        >
-                          Confirm
-                        </button>
-                        <button
-                          className="admin-button-secondary"
-                          style={{ fontSize: "12px", padding: "4px 10px" }}
-                          onClick={() => rejectQuoteRequest(request._id)}
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const renderContent = () => {
-    switch (currentView) {
-      case "dashboard":
-        return renderDashboard();
-      case "projects":
-        return (
-          <EmptyState
-            title="Projects"
-            message="Project management will be implemented here."
-          />
-        );
-      case "plots":
-        return (
-          <EmptyState
-            title="Plots"
-            message="Plot management will be implemented here."
-          />
-        );
-      case "quotes":
-        return (
-          <EmptyState
-            title="Quote Requests"
-            message="Quote request management will be implemented here."
-          />
-        );
-      case "users":
-        return (
-          <EmptyState
-            title="Users"
-            message="User management will be implemented here."
-          />
-        );
-      case "settings":
-        return (
-          <EmptyState
-            title="Settings"
-            message="Settings will be implemented here."
-          />
-        );
-      default:
-        return renderDashboard();
-    }
-  };
+    );
+  }
 
   return (
-    <div
-      className="admin-dashboard"
-      style={{ display: "flex", minHeight: "100vh" }}
-    >
-      {/* Sidebar */}
-      <div
-        style={{
-          width: "280px",
-          backgroundColor: "var(--sage-600)",
-          color: "var(--text-on-dark)",
-          position: "fixed",
-          height: "100vh",
-          left: mobileMenuOpen
-            ? "0"
-            : typeof window !== "undefined" && window.innerWidth < 768
-            ? "-280px"
-            : "0",
-          transition: "left 0.3s ease",
-          zIndex: 1000,
-          boxShadow: "var(--shadow-lg)",
-        }}
-      >
-        <div
-          style={{
-            padding: "20px",
-            borderBottom: "1px solid rgba(255,255,255,0.2)",
-            backgroundColor: "var(--sage-700)",
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontSize: "24px",
-              fontFamily: "var(--font-geist-sans)",
-              fontWeight: "600",
-              color: "var(--text-on-dark)",
-            }}
-          >
-            Nestline Admin
-          </h2>
-        </div>
+    <div className="admin-dashboard">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <div style={{ padding: "20px 0" }}>
-          {menuItems.map((item) => (
-            <div
-              key={item.key}
-              onClick={() => {
-                setCurrentView(item.key);
-                setMobileMenuOpen(false);
-              }}
-              style={{
-                padding: "12px 20px",
-                cursor: "pointer",
-                backgroundColor:
-                  currentView === item.key ? "var(--sage-500)" : "transparent",
-                borderLeft:
-                  currentView === item.key
-                    ? "4px solid var(--text-on-dark)"
-                    : "4px solid transparent",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                fontSize: "14px",
-                fontFamily: "var(--font-geist-sans)",
-                fontWeight: currentView === item.key ? "500" : "400",
-                color: "var(--text-on-dark)",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (currentView !== item.key) {
-                  e.currentTarget.style.backgroundColor =
-                    "rgba(255,255,255,0.1)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (currentView !== item.key) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }
-              }}
-            >
-              <span style={{ fontSize: "18px" }}>{item.icon}</span>
-              {item.label}
+      <div
+        className={`admin-main ${
+          !sidebarOpen ? "sidebar-hidden md:sidebar-visible" : ""
+        }`}
+      >
+        <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+        <main className="p-6">
+          {/* Page header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Portfolio Overview
+            </h2>
+            <p className="text-gray-600">
+              Real-time analytics and project insights
+            </p>
+          </div>
+
+          {/* Stats cards */}
+          <div className="stats-grid">
+            <StatsCard
+              title="Total Portfolio Value"
+              value={`KSh ${(
+                (stats?.totalPortfolioValue || 0) / 1000000
+              ).toFixed(1)}M`}
+              description={`${stats?.totalPlots || 0} plots across ${
+                stats?.totalProjects || 0
+              } projects`}
+              icon="💰"
+              trend="positive"
+              trendValue="12.5%"
+              color="sage"
+            />
+
+            <StatsCard
+              title="Available Plots"
+              value={stats?.availablePlots || 0}
+              description={`${stats?.plotsOnHold || 0} on hold, ${
+                stats?.soldPlots || 0
+              } sold`}
+              icon="📍"
+              trend="negative"
+              trendValue="5.2%"
+              color="success"
+            />
+
+            <StatsCard
+              title="Monthly Revenue"
+              value={`KSh ${((stats?.monthlyRevenue || 0) / 1000000).toFixed(
+                1
+              )}M`}
+              description="Revenue this month"
+              icon="📊"
+              trend="positive"
+              trendValue="8.7%"
+              color="warning"
+            />
+
+            <StatsCard
+              title="Conversion Rate"
+              value={`${stats?.conversionRate || 0}%`}
+              description={`${stats?.averageDaysToSale || 0} avg days to sale`}
+              icon="🎯"
+              trend="positive"
+              trendValue="3.1%"
+              color="error"
+            />
+          </div>
+
+          {/* Map and recent activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Project locations map */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Project Locations
+                </h3>
+                <div className="flex gap-2">
+                  <button className="px-3 py-1 text-sm bg-sage-500 text-white rounded">
+                    Satellite
+                  </button>
+                  <button className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded">
+                    Roadmap
+                  </button>
+                </div>
+              </div>
+
+              <div className="map-container">
+                <GoogleMap
+                  plots={plots}
+                  center={{ lat: -3.2207, lng: 40.1173 }}
+                  zoom={10}
+                  onPlotClick={(plot) => console.log("Clicked plot:", plot)}
+                  className="w-full h-full"
+                />
+
+                {/* Map legend */}
+                <div className="map-legend">
+                  <h4 className="font-semibold text-sm text-gray-900 mb-2">
+                    Plot Status
+                  </h4>
+                  <div className="legend-item">
+                    <div className="legend-color bg-green-500"></div>
+                    <span>Available</span>
+                  </div>
+                  <div className="legend-item">
+                    <div className="legend-color bg-yellow-500"></div>
+                    <span>On Hold</span>
+                  </div>
+                  <div className="legend-item">
+                    <div className="legend-color bg-blue-500"></div>
+                    <span>Confirmed</span>
+                  </div>
+                  <div className="legend-item">
+                    <div className="legend-color bg-red-500"></div>
+                    <span>Sold</span>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Mobile overlay */}
-      {mobileMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 999,
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
+            {/* Project health */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Project Health
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Performance and milestone tracking
+              </p>
 
-      {/* Main content */}
-      <div
-        style={{
-          marginLeft:
-            typeof window !== "undefined" && window.innerWidth < 768
-              ? "0"
-              : "280px",
-          width:
-            typeof window !== "undefined" && window.innerWidth < 768
-              ? "100%"
-              : "calc(100% - 280px)",
-          minHeight: "100vh",
-        }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            backgroundColor: "var(--background-card)",
-            padding: "16px 24px",
-            boxShadow: "var(--shadow-sm)",
-            borderBottom: "1px solid var(--border-light)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {typeof window !== "undefined" && window.innerWidth < 768 && (
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                style={{
-                  padding: "8px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  fontSize: "18px",
-                  cursor: "pointer",
-                  color: "var(--text-primary)",
-                }}
-              >
-                ☰
-              </button>
-            )}
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "24px",
-                fontFamily: "var(--font-geist-sans)",
-                color: "var(--text-primary)",
-                fontWeight: "600",
-              }}
-            >
-              Nestline Capital - Admin Dashboard
-            </h1>
+              <div className="space-y-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium text-gray-900">
+                      PalmCrest Phase 1
+                    </h4>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                      ON TRACK
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Completion</span>
+                        <span className="font-medium">75%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{ width: "75%" }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Budget Used</span>
+                        <span className="font-medium">68%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-sage-500 h-2 rounded-full"
+                          style={{ width: "68%" }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Plots Sold</span>
+                        <span className="font-medium">12/16</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-500 h-2 rounded-full"
+                          style={{ width: "75%" }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <span className="font-medium">Next Milestone:</span>
+                      <span className="ml-2">
+                        Infrastructure completion - Jan 15, 2025
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: "14px",
-              color: "var(--text-secondary)",
-              fontFamily: "var(--font-geist-sans)",
-            }}
-          >
-            Welcome, Admin
-          </div>
-        </div>
 
-        {/* Content */}
-        <div style={{ padding: "24px" }}>{renderContent()}</div>
+          {/* Recent plots table */}
+          <div className="plot-table">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Recent Plot Activity
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Latest updates and transactions
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Plot ID</th>
+                    <th>Size</th>
+                    <th>Price/Acre</th>
+                    <th>Status</th>
+                    <th>Location</th>
+                    <th>Last Updated</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {plots.slice(0, 10).map((plot) => (
+                    <tr key={plot._id}>
+                      <td className="font-medium">{plot.plotId}</td>
+                      <td>{plot.sizeInAcres} acres</td>
+                      <td>KSh {(plot.pricePerAcre || 0).toLocaleString()}</td>
+                      <td>
+                        <span className={`plot-status ${plot.status}`}>
+                          {plot.status}
+                        </span>
+                      </td>
+                      <td className="text-gray-600">{plot.location}</td>
+                      <td className="text-gray-500">
+                        {new Date(plot.updatedAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
