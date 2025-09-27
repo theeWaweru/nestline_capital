@@ -9,7 +9,7 @@ import Header from "@/components/admin/Header";
 import PlotTable from "@/components/admin/PlotTable";
 import PlotFilters from "@/components/admin/PlotFilters";
 import PlotStats from "@/components/admin/PlotStats";
-import GoogleMap from "@/components/maps/GoogleMap";
+import GoogleMap from "@/components/maps/google-map";
 
 export default function PlotInventoryPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

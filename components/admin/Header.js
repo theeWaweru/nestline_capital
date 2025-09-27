@@ -1,69 +1,45 @@
-// =============================================================================
-// 4. components/admin/Header.js - Admin header with user info
-// =============================================================================
+// components/admin/Header.js
 "use client";
 
-import { useState } from "react";
-
-export default function Header({ onMenuToggle }) {
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
+export default function Header() {
   return (
     <header className="admin-header">
-      <div className="flex items-center gap-4">
-        <button className="mobile-menu-toggle md:hidden" onClick={onMenuToggle}>
-          ☰
-        </button>
-        <h1 className="text-xl font-semibold text-gray-900">
-          Nestline Capital - Admin Dashboard
-        </h1>
+      <div className="header-left">
+        <div>
+          <h1 className="header-title">Plot Inventory Management</h1>
+          <p className="header-subtitle">
+            Monitor plot availability, track status changes, and manage
+            inventory across all development phases
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Notifications */}
-        <button className="relative p-2 text-gray-600 hover:text-gray-900">
-          <span className="text-lg">🔔</span>
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            3
-          </span>
-        </button>
+      <div className="header-right">
+        <select className="header-select">
+          <option value="all">All Projects</option>
+          <option value="palmcrest">PalmCrest Residence</option>
+          <option value="greenfield">Greenfield Estates</option>
+        </select>
 
-        {/* User menu */}
-        <div className="relative">
-          <button
-            className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100"
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
+        <div className="user-menu">
+          <div className="user-avatar">JD</div>
+          <div>
+            <div className="text-sm font-medium">John Doe</div>
+            <div className="text-xs text-gray-500">Admin</div>
+          </div>
+          <svg
+            className="w-4 h-4 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <div className="w-8 h-8 bg-sage-500 rounded-full flex items-center justify-center text-white font-semibold">
-              A
-            </div>
-            <span className="text-sm font-medium text-gray-700">Admin</span>
-            <span className="text-gray-400">▼</span>
-          </button>
-
-          {userMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-              <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Profile Settings
-              </a>
-              <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                System Settings
-              </a>
-              <hr className="my-2" />
-              <a
-                href="#"
-                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              >
-                Sign Out
-              </a>
-            </div>
-          )}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
         </div>
       </div>
     </header>

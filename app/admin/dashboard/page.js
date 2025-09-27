@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "@/components/admin/Sidebar";
 import Header from "@/components/admin/Header";
 import StatsCard from "@/components/admin/StatsCard";
-// import GoogleMap from "@/components/maps/GoogleMap";
+import GoogleMap from "@/components/maps/google-map";
 
 
 export default function AdminDashboard() {

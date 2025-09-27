@@ -1,37 +1,24 @@
-// =============================================================================
-// 5. components/admin/StatsCard.js - Statistics display card
-// =============================================================================
+// components/admin/StatsCard.js
+"use client";
+
 export default function StatsCard({
   title,
   value,
-  description,
   icon,
-  trend,
-  trendValue,
-  color = "sage",
+  type = "primary",
+  change,
 }) {
-  const colorClasses = {
-    sage: "text-sage-600",
-    success: "text-success-600",
-    warning: "text-warning-600",
-    error: "text-error-600",
-  };
-
   return (
     <div className="stat-card">
-      <div className="stat-header">
-        <div className="stat-icon">{icon}</div>
-        {trend && trendValue && (
-          <div className={`stat-trend ${trend}`}>
-            <span>{trend === "positive" ? "↗" : "↘"}</span>
-            {trendValue}
-          </div>
-        )}
-      </div>
-
-      <div className="stat-label">{title}</div>
-      <div className={`stat-value ${colorClasses[color]}`}>{value}</div>
-      <div className="stat-description">{description}</div>
+      <div className={`stat-card-icon ${type}`}>{icon}</div>
+      <h3 className="stat-value">{value}</h3>
+      <p className="stat-label">{title}</p>
+      {change && (
+        <div className={`stat-change ${change >= 0 ? "positive" : "negative"}`}>
+          {change >= 0 ? "+" : ""}
+          {change}% vs last quarter
+        </div>
+      )}
     </div>
   );
 }
