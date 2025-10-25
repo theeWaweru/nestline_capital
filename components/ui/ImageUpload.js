@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 
 export default function ImageUpload({
   onImagesChange,
@@ -72,7 +73,7 @@ export default function ImageUpload({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {images.map((imageUrl, index) => (
           <div key={index} className="relative group">
-            <img
+            <Image
               src={imageUrl}
               alt={`Upload ${index + 1}`}
               className="w-full h-32 object-cover rounded-lg border border-gray-300"

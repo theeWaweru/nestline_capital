@@ -1,11 +1,6 @@
 // app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
-import "./normalize.css";
-import "./webflow.css";
 import "./globals.css";
-import "./nestline.css";
-import Footer from "./components/footer";
-import Menu from "./components/menu";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = Geist({
@@ -46,13 +41,11 @@ export default function RootLayout({ children }) {
           `,
           }}
         />
-        <script src="/jquery.js" async></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <script src="/webflow.js" async></script>
       </body>
     </html>
   );
