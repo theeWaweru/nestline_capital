@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Sidebar from "@/components/admin/Sidebar";
 import Header from "@/components/admin/Header";
-import PlotForm from "@/components/forms/PlotForm";
+// import PlotForm from "@/components/forms/PlotForm";
 
 export default function NewPlotPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,3 +1,4 @@
+// app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
 import "./normalize.css";
 import "./webflow.css";
@@ -22,7 +23,7 @@ export const metadata = {
   description:
     "We build wealth, value, and trust through smart real estate investment.",
   viewport: "width=device-width, initial-scale=1",
-  generator: "Next.js", // Remove "Webflow"
+  generator: "Next.js",
   icons: {
     icon: "/images/favicon.svg",
     shortcut: "/images/favicon.svg",
@@ -50,9 +51,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Menu />
         {children}
-        <Footer />
         <script src="/webflow.js" async></script>
       </body>
     </html>
