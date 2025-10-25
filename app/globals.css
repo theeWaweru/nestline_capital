@@ -1,329 +1,58 @@
-/* Enhanced globals.css - Integrated with your existing system */
 @import "tailwindcss";
 
-/* Your existing CSS variables */
 :root {
+  /* Colors */
+  --sage-green: #5c8a75;
+  --success: #059669;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --danger: #f43f5e;
+
+  /* Backgrounds */
   --background: #ffffff;
-  --foreground: #171717;
+  --background-gray: #f9fafb;
+  --foreground: #111827;
+
+  /* Borders */
+  --border: #e5e7eb;
+
+  /* Font variables */
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Tailwind theme configuration */
+  --color-sage-green: var(--sage-green);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-/* NEW: Admin Dashboard Design System (Based on Nestline logo colors) */
-:root {
-  /* Primary Brand Colors - Based on Logo */
-  --sage-50: #f6f8f7;
-  --sage-100: #e8f0ec;
-  --sage-200: #d1e0d8;
-  --sage-300: #a9c4b8;
-  --sage-400: #7da594;
-  --sage-500: #5c8a75;
-  /* Main sage green from logo */
-  --sage-600: #4a7360;
-  --sage-700: #3e5f51;
-  --sage-800: #344c43;
-  --sage-900: #2d4038;
-
-  /* Neutral Palette - Improved */
-  --cream-50: #fefdfb;
-  --cream-100: #f7f4ef;
-  /* Your original background */
-  --cream-200: #f0ede6;
-  --cream-300: #e8e3da;
-  --cream-400: #d4cfc4;
-  --cream-500: #b8b2a5;
-  --cream-600: #9c9588;
-  --cream-700: #7a7469;
-  --cream-800: #5a5550;
-  --cream-900: #3d3b37;
-
-  /* Dark Palette - Enhanced */
-  --dark-50: #f8f9f8;
-  --dark-100: #e8eae8;
-  --dark-200: #d1d5d2;
-  --dark-300: #a8b0ab;
-  --dark-400: #7a847e;
-  --dark-500: #56625c;
-  --dark-600: #454f48;
-  --dark-700: #3a423c;
-  --dark-800: #2d342f;
-  --dark-900: #171a15;
-
-  /* Semantic Colors */
-  --success-50: #f0fdf4;
-  --success-500: #22c55e;
-  --success-600: #16a34a;
-
-  --warning-50: #fffbeb;
-  --warning-500: #f59e0b;
-  --warning-600: #d97706;
-
-  --error-50: #fef2f2;
-  --error-500: #ef4444;
-  --error-600: #dc2626;
-
-  /* Typography - Using your Geist fonts */
-  --font-primary: var(--font-geist-sans);
-  --font-display: var(--font-geist-sans);
-  /* Using Geist for consistency */
-
-  /* Application Colors - Admin Dashboard */
-  --background-primary: var(--cream-100);
-  --background-secondary: var(--cream-50);
-  --background-dark: var(--dark-900);
-  --background-card: var(--cream-50);
-
-  --text-primary: var(--dark-900);
-  --text-secondary: var(--dark-700);
-  --text-muted: var(--dark-500);
-  --text-on-dark: var(--cream-50);
-
-  --border-light: var(--cream-300);
-  --border-medium: var(--cream-400);
-  --border-dark: var(--dark-300);
-
-  --overlay-light: rgba(23, 26, 21, 0.05);
-  --overlay-medium: rgba(23, 26, 21, 0.15);
-  --overlay-dark: rgba(23, 26, 21, 0.25);
-
-  /* Interactive States */
-  --primary: var(--sage-500);
-  --primary-hover: var(--sage-600);
-  --primary-light: var(--sage-100);
-
-  --accent: var(--cream-600);
-  --accent-hover: var(--cream-700);
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(23, 26, 21, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(23, 26, 21, 0.1), 0 2px 4px -1px rgba(23, 26, 21, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(23, 26, 21, 0.1), 0 4px 6px -2px rgba(23, 26, 21, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(23, 26, 21, 0.1), 0 10px 10px -5px rgba(23, 26, 21, 0.04);
-}
-
-/* Dark mode variations for admin dashboard */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-primary: var(--dark-900);
-    --background-secondary: var(--dark-800);
-    --background-card: var(--dark-800);
-
-    --text-primary: var(--cream-50);
-    --text-secondary: var(--cream-200);
-    --text-muted: var(--cream-400);
-
-    --border-light: var(--dark-700);
-    --border-medium: var(--dark-600);
-    --border-dark: var(--dark-500);
-
-    --overlay-light: rgba(247, 244, 239, 0.05);
-    --overlay-medium: rgba(247, 244, 239, 0.15);
-    --overlay-dark: rgba(247, 244, 239, 0.25);
-  }
-}
-
-/* Your existing body styles */
+/* Base styles */
 body {
+  font-family: var(--font-body), system-ui, sans-serif;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
-image,
+/* Headings use Funnel Display */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.heading {
+  font-family: var(--font-heading), system-ui, sans-serif;
+}
+
+/* Ensure images don't break layout */
 img {
-  position: relative !important;
-}
-
-/* NEW: Admin Dashboard Component Styles */
-.admin-dashboard {
-  font-family: var(--font-primary);
-  background-color: var(--background-primary);
-  color: var(--text-primary);
-}
-
-.admin-card {
-  background-color: var(--background-card);
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-light);
-  transition: all 0.2s ease;
-}
-
-.admin-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-
-.admin-button-primary {
-  background-color: var(--primary);
-  color: var(--text-on-dark);
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-family: var(--font-primary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.admin-button-primary:hover {
-  background-color: var(--primary-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.admin-button-secondary {
-  background-color: transparent;
-  color: var(--primary);
-  border: 2px solid var(--primary);
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-family: var(--font-primary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.admin-button-secondary:hover {
-  background-color: var(--primary);
-  color: var(--text-on-dark);
-}
-
-.admin-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid var(--border-light);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: var(--font-primary);
-  background-color: var(--background-secondary);
-  color: var(--text-primary);
-  transition: border-color 0.2s ease;
-  outline: none;
-}
-
-.admin-input:focus {
-  border-color: var(--primary);
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: var(--background-card);
-}
-
-.admin-table thead tr {
-  background-color: var(--sage-50);
-}
-
-.admin-table th {
-  padding: 12px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: var(--font-primary);
-  color: var(--text-secondary);
-  border-bottom: 2px solid var(--border-light);
-}
-
-.admin-table td {
-  padding: 12px;
-  font-size: 14px;
-  font-family: var(--font-primary);
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-light);
-}
-
-.admin-table tbody tr:hover {
-  background-color: var(--sage-50);
-}
-
-.status-available {
-  background-color: var(--success-500);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-requested {
-  background-color: var(--warning-500);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-confirmed {
-  background-color: var(--sage-500);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-sold {
-  background-color: var(--error-500);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--border-light);
-  border-top: 3px solid var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive adjustments for admin dashboard */
-@media (max-width: 768px) {
-  .admin-dashboard .sidebar {
-    transform: translateX(-100%);
-  }
-
-  .admin-dashboard .sidebar.open {
-    transform: translateX(0);
-  }
-}
-
-/* Integration with your existing webflow styles - Ensure compatibility */
-.admin-dashboard * {
-  box-sizing: border-box;
-}
-
-/* Ensure admin styles don't interfere with your existing pages */
-.page-wrapper .admin-dashboard {
-  /* Reset any inherited styles from webflow.css */
-  font-family: var(--font-primary) !important;
+  max-width: 100%;
+  height: auto;
 }

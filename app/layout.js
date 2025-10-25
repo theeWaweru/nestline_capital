@@ -1,24 +1,25 @@
 // app/layout.js
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { Funnel_Display, Quicksand } from "next/font/google";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const funnelDisplay = Funnel_Display({
+  variable: "--font-heading",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const quicksand = Quicksand({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata = {
-  title: "Nestline Capital - Trusted Pathways to Prosperity",
+  title: "The Kiota by Nestline Capital - Trusted Pathways to Prosperity",
   description:
-    "We build wealth, value, and trust through smart real estate investment.",
+    "Property management system for Nestline Capital. Let us build wealth, value, and trust through smart real estate investment.",
   viewport: "width=device-width, initial-scale=1",
-  generator: "Next.js",
   icons: {
     icon: "/images/favicon.svg",
     shortcut: "/images/favicon.svg",
@@ -41,9 +42,19 @@ export default function RootLayout({ children }) {
           `,
           }}
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Quicksand:wght@300..700&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${funnelDisplay.variable} ${quicksand.variable} antialiased`}
       >
         {children}
       </body>
