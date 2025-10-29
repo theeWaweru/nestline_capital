@@ -1,5 +1,5 @@
-// File: app/admin/page.js
-// Admin dashboard - full system control panel
+// File: app/editor/dashboard/page.js
+// Editor dashboard - plot and booking management
 "use client";
 
 import { useEffect, useState } from "react";
@@ -35,34 +35,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Home,
-  MapPin,
-  Users,
-  FileText,
-  Settings,
-  LogOut,
-  UserPlus,
-  BarChart3,
-  Shield,
-} from "lucide-react";
+import { Home, MapPin, FileText, User, LogOut, Edit3 } from "lucide-react";
 
-export default function AdminDashboard() {
+export default function EditorDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [stats, setStats] = useState({
-    totalPlots: 0,
-    available: 0,
-    sold: 0,
-    totalUsers: 0,
-    editors: 0,
+    plotsManaged: 0,
     pendingBookings: 0,
+    processedToday: 0,
   });
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    } else if (session?.user?.role !== "admin") {
+    } else if (
+      session?.user?.role !== "editor" &&
+      session?.user?.role !== "admin"
+    ) {
       router.push("/dashboard");
     }
   }, [status, session, router]);
@@ -82,9 +72,9 @@ export default function AdminDashboard() {
           <SidebarHeader>
             <div className="px-4 py-3">
               <h1 className="text-xl font-semibold text-[#5c8a75]">
-                Nestline Admin
+                Nestline Editor
               </h1>
-              <p className="text-xs text-gray-500">Full Control Panel</p>
+              <p className="text-xs text-gray-500">Content Management</p>
             </div>
           </SidebarHeader>
 
@@ -92,7 +82,7 @@ export default function AdminDashboard() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/admin/dashboard">
+                  <Link href="/editor/dashboard">
                     <Home className="w-4 h-4" />
                     <span>Dashboard</span>
                   </Link>
@@ -101,38 +91,20 @@ export default function AdminDashboard() {
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/admin/plots">
+                  <Link href="/editor/plots">
                     <MapPin className="w-4 h-4" />
-                    <span>Plot Management</span>
+                    <span>Manage Plots</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/admin/users">
-                    <Users className="w-4 h-4" />
-                    <span>User Management</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/editors">
-                    <UserPlus className="w-4 h-4" />
-                    <span>Invite Editors</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/bookings">
+                  <Link href="/editor/bookings">
                     <FileText className="w-4 h-4" />
-                    <span>Bookings</span>
+                    <span>Process Bookings</span>
                     {stats.pendingBookings > 0 && (
-                      <Badge className="ml-auto bg-red-500">
+                      <Badge className="ml-auto bg-amber-500">
                         {stats.pendingBookings}
                       </Badge>
                     )}
@@ -142,18 +114,9 @@ export default function AdminDashboard() {
 
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/admin/analytics">
-                    <BarChart3 className="w-4 h-4" />
-                    <span>Analytics</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/settings">
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
+                  <Link href="/editor/profile">
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -167,26 +130,24 @@ export default function AdminDashboard() {
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton className="w-full">
                       <Avatar className="w-8 h-8">
-                        <AvatarFallback className="bg-[#5c8a75] text-white">
-                          {session?.user?.name?.charAt(0) || "A"}
+                        <AvatarFallback className="bg-blue-600 text-white">
+                          {session?.user?.name?.charAt(0) || "E"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col items-start text-left flex-1">
                         <span className="text-sm font-medium">
                           {session?.user?.name}
                         </span>
-                        <span className="text-xs text-gray-500">
-                          Administrator
-                        </span>
+                        <span className="text-xs text-gray-500">Editor</span>
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
+                    <DropdownMenuLabel>Editor Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/admin/profile">
-                        <Shield className="w-4 h-4 mr-2" />
+                      <Link href="/editor/profile">
+                        <Edit3 className="w-4 h-4 mr-2" />
                         Profile Settings
                       </Link>
                     </DropdownMenuItem>
@@ -210,15 +171,17 @@ export default function AdminDashboard() {
               <SidebarTrigger />
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Admin Dashboard
+                  Editor Dashboard
                 </h2>
-                <p className="text-sm text-gray-600">Complete system control</p>
+                <p className="text-sm text-gray-600">
+                  Manage plots and bookings
+                </p>
               </div>
             </div>
 
-            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
-              <Shield className="w-3 h-3 mr-1" />
-              Admin
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+              <Edit3 className="w-3 h-3 mr-1" />
+              Editor
             </Badge>
           </header>
 
@@ -226,40 +189,13 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
                 <CardHeader className="pb-3">
-                  <CardDescription>Total Plots</CardDescription>
+                  <CardDescription>Plots Managed</CardDescription>
                   <CardTitle className="text-3xl text-[#5c8a75]">
-                    {stats.totalPlots}
+                    {stats.plotsManaged}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Badge
-                      variant="secondary"
-                      className="bg-emerald-100 text-emerald-800"
-                    >
-                      {stats.available} Available
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-rose-100 text-rose-800"
-                    >
-                      {stats.sold} Sold
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>System Users</CardDescription>
-                  <CardTitle className="text-3xl text-blue-600">
-                    {stats.totalUsers}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">
-                    {stats.editors} active editors
-                  </p>
+                  <p className="text-sm text-gray-600">Under management</p>
                 </CardContent>
               </Card>
 
@@ -271,7 +207,19 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">Require review</p>
+                  <p className="text-sm text-gray-600">Awaiting review</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardDescription>Processed Today</CardDescription>
+                  <CardTitle className="text-3xl text-emerald-600">
+                    {stats.processedToday}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600">Bookings handled</p>
                 </CardContent>
               </Card>
             </div>
@@ -286,21 +234,15 @@ export default function AdminDashboard() {
                     asChild
                     className="w-full bg-[#5c8a75] hover:bg-[#4a6f5f]"
                   >
-                    <Link href="/admin/editors">
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Invite Editor
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link href="/admin/plots">
+                    <Link href="/editor/plots/add">
                       <MapPin className="w-4 h-4 mr-2" />
                       Add New Plot
                     </Link>
                   </Button>
                   <Button asChild variant="outline" className="w-full">
-                    <Link href="/admin/users">
-                      <Users className="w-4 h-4 mr-2" />
-                      Manage Users
+                    <Link href="/editor/bookings">
+                      <FileText className="w-4 h-4 mr-2" />
+                      Review Bookings
                     </Link>
                   </Button>
                 </CardContent>
@@ -309,8 +251,8 @@ export default function AdminDashboard() {
               <Card className="border-amber-200">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span className="text-amber-600">⚠</span>
-                    Needs Attention
+                    <span className="text-amber-600">📋</span>
+                    Pending Tasks
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -320,38 +262,48 @@ export default function AdminDashboard() {
                       variant="outline"
                       className="w-full justify-start"
                     >
-                      <Link href="/admin/bookings">
+                      <Link href="/editor/bookings">
                         <FileText className="w-4 h-4 mr-2" />
-                        {stats.pendingBookings} Pending Booking
+                        {stats.pendingBookings} Booking
                         {stats.pendingBookings !== 1 ? "s" : ""}
                       </Link>
                     </Button>
                   ) : (
                     <p className="text-sm text-gray-500 py-4 text-center">
-                      All caught up! 🎉
+                      All done! ✓
                     </p>
                   )}
                 </CardContent>
               </Card>
             </div>
 
-            <Card className="border-[#5c8a75] border-l-4">
+            <Card className="border-blue-200 border-l-4">
               <CardHeader>
-                <CardTitle className="text-base">Admin Capabilities</CardTitle>
+                <CardTitle className="text-base">Editor Permissions</CardTitle>
               </CardHeader>
-              <CardContent className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                <ul className="space-y-2">
-                  <li>✓ Create, edit, delete all content</li>
-                  <li>✓ Invite and manage editors</li>
-                  <li>✓ Approve/reject bookings</li>
-                  <li>✓ Manage user accounts</li>
-                </ul>
-                <ul className="space-y-2">
-                  <li>✓ View analytics</li>
-                  <li>✓ Configure settings</li>
-                  <li>✓ Access audit logs</li>
-                  <li>✓ Full database access</li>
-                </ul>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-emerald-700 mb-2">
+                      ✓ You Can:
+                    </p>
+                    <ul className="space-y-1 text-gray-600">
+                      <li>• Add and edit plots</li>
+                      <li>• Process bookings</li>
+                      <li>• Update availability</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-medium text-red-700 mb-2">
+                      ✗ You Cannot:
+                    </p>
+                    <ul className="space-y-1 text-gray-600">
+                      <li>• Delete users/plots</li>
+                      <li>• Invite editors</li>
+                      <li>• Access settings</li>
+                    </ul>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </main>
