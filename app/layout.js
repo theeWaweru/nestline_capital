@@ -1,6 +1,7 @@
 // app/layout.js
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Funnel_Display, Quicksand } from "next/font/google";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const funnelDisplay = Funnel_Display({
@@ -56,7 +57,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${funnelDisplay.variable} ${quicksand.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

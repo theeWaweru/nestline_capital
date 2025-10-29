@@ -1,6 +1,14 @@
 // File: scripts/create-admin.js
-// Run once to create the first admin user
-// Usage: node scripts/create-admin.js
+// Run: node scripts/create-admin.js
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env.local from project root
+dotenv.config({ path: join(__dirname, "..", ".env.local") });
 
 import connectDB from "../lib/database.js";
 import User from "../lib/models/User.js";
@@ -9,7 +17,6 @@ async function createAdmin() {
   try {
     await connectDB();
 
-    // Check if admin already exists
     const existingAdmin = await User.findOne({
       email: "davidngari47@gmail.com",
     });
@@ -21,7 +28,7 @@ async function createAdmin() {
     const admin = new User({
       name: "Admin",
       email: "davidngari47@gmail.com",
-      password: "Waweru@98", // CHANGE THIS PASSWORD!
+      password: "Waweru@98",
       role: "admin",
       emailVerified: true,
       isActive: true,
@@ -34,7 +41,7 @@ async function createAdmin() {
     console.log("⚠️  CHANGE PASSWORD AFTER FIRST LOGIN");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error creating admin:", error.message);
+    console.error("❌ Error:", error.message);
     process.exit(1);
   }
 }
