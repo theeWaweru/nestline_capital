@@ -53,7 +53,6 @@
 
 .admin-main {
     flex: 1;
-    margin-left: 260px;
     display: flex;
     flex-direction: column;
 }
