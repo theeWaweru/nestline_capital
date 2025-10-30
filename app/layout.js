@@ -20,12 +20,16 @@ export const metadata = {
   title: "The Kiota by Nestline Capital - Trusted Pathways to Prosperity",
   description:
     "Property management system for Nestline Capital. Let us build wealth, value, and trust through smart real estate investment.",
-  viewport: "width=device-width, initial-scale=1",
   icons: {
     icon: "/images/favicon.svg",
     shortcut: "/images/favicon.svg",
     apple: "/images/webclip.svg",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }) {
@@ -48,10 +52,6 @@ export default function RootLayout({ children }) {
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Quicksand:wght@300..700&display=swap"
-          rel="stylesheet"
         />
       </head>
       <body

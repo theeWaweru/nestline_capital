@@ -69,8 +69,8 @@ export default function ForgotPasswordPage() {
             </div>
             <CardTitle>Check Your Email</CardTitle>
             <CardDescription className="mt-2">
-              If an account exists for <strong>{email}</strong>, you'll receive
-              reset instructions.
+              If an account exists for <strong>{email}</strong>, you&apos;ll
+              receive reset instructions.
             </CardDescription>
           </CardHeader>
           <CardContent>

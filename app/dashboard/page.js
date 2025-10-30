@@ -1,5 +1,4 @@
-// File: app/dashboard/page.js
-// User dashboard - main page for regular users
+// app/dashboard/page.js
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,6 +15,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar";
 import {
   Card,
@@ -41,24 +43,23 @@ export default function UserDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [stats, setStats] = useState({
-    available: 0,
+    availablePlots: 0,
     myBookings: 0,
-    totalPlots: 0,
+    totalProjects: 0,
   });
 
   useEffect(() => {
+    if (status === "loading") return;
+
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
-  if (status === "loading") {
+  if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full"></div>
       </div>
     );
   }
@@ -66,91 +67,137 @@ export default function UserDashboard() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
+        {/* User Sidebar */}
         <Sidebar>
-          <SidebarHeader>
-            <div className="px-4 py-3">
+          <SidebarHeader className="border-b px-6 py-5">
+            <Link href="/dashboard" className="flex flex-col">
               <h1 className="text-xl font-semibold text-[#5c8a75]">
                 Nestline Capital
               </h1>
-              <p className="text-xs text-gray-500">Investment Platform</p>
-            </div>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Investment Platform
+              </p>
+            </Link>
           </SidebarHeader>
 
           <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard">
-                    <Home className="w-4 h-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarGroup>
+              <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive>
+                      <Link href="/dashboard">
+                        <Home />
+                        <span>Dashboard</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard/plots">
-                    <MapPin className="w-4 h-4" />
-                    <span>Browse Plots</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/plots">
+                        <MapPin />
+                        <span>Browse Plots</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard/my-bookings">
-                    <FileText className="w-4 h-4" />
-                    <span>My Bookings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/dashboard/bookings">
+                        <FileText />
+                        <span>My Bookings</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {stats.myBookings > 0 && (
+                      <Badge className="ml-auto bg-blue-500 text-white text-xs px-2">
+                        {stats.myBookings}
+                      </Badge>
+                    )}
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/dashboard/profile">
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <SidebarGroup>
+              <SidebarGroupLabel>Account</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/dashboard/profile">
+                        <User />
+                        <span>Profile</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter>
+          <SidebarFooter className="border-t">
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton className="w-full">
-                      <Avatar className="w-8 h-8">
-                        <AvatarFallback className="bg-[#5c8a75] text-white">
-                          {session?.user?.name?.charAt(0) || "U"}
+                    <SidebarMenuButton
+                      size="lg"
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarFallback className="rounded-lg bg-[#5c8a75] text-white">
+                          {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col items-start text-left flex-1">
-                        <span className="text-sm font-medium">
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
                           {session?.user?.name}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="truncate text-xs text-gray-500">
                           {session?.user?.email}
                         </span>
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuContent
+                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                    side="bottom"
+                    align="end"
+                    sideOffset={4}
+                  >
+                    <DropdownMenuLabel className="p-0 font-normal">
+                      <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                        <Avatar className="h-8 w-8 rounded-lg">
+                          <AvatarFallback className="rounded-lg bg-[#5c8a75] text-white">
+                            {session?.user?.name?.charAt(0)?.toUpperCase() ||
+                              "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">
+                            {session?.user?.name}
+                          </span>
+                          <span className="truncate text-xs text-gray-500">
+                            {session?.user?.email}
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard/profile">
-                        <User className="w-4 h-4 mr-2" />
+                        <User className="mr-2 h-4 w-4" />
                         Profile Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => signOut({ callbackUrl: "/login" })}
+                      className="text-red-600 focus:text-red-600"
                     >
-                      <LogOut className="w-4 h-4 mr-2" />
+                      <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -160,116 +207,167 @@ export default function UserDashboard() {
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col">
-          <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        {/* Main Content */}
+        <div className="flex flex-1 flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b bg-white px-6">
             <div className="flex items-center gap-4">
-              <SidebarTrigger />
+              <SidebarTrigger className="-ml-1" />
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
                   Welcome, {session?.user?.name?.split(" ")[0]}
                 </h2>
-                <p className="text-sm text-gray-600">
-                  Explore plots and manage investments
-                </p>
+                <p className="text-sm text-gray-600">Manage your investments</p>
               </div>
             </div>
 
-            <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">
-              {session?.user?.role || "User"}
+            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200">
+              Investor
             </Badge>
           </header>
 
-          <main className="flex-1 p-6 bg-gray-50">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Available Plots</CardDescription>
-                  <CardTitle className="text-3xl text-[#5c8a75]">
-                    {stats.available}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">Ready for booking</p>
-                </CardContent>
-              </Card>
+          {/* Scrollable Content Area */}
+          <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <div className="mx-auto max-w-7xl space-y-6">
+              {/* Stats Grid */}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardDescription>Available Plots</CardDescription>
+                    <CardTitle className="text-3xl text-[#5c8a75]">
+                      {stats.availablePlots}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">
+                      Explore opportunities
+                    </p>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>My Bookings</CardDescription>
-                  <CardTitle className="text-3xl text-blue-600">
-                    {stats.myBookings}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">Active reservations</p>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardDescription>My Bookings</CardDescription>
+                    <CardTitle className="text-3xl text-blue-600">
+                      {stats.myBookings}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">Active reservations</p>
+                  </CardContent>
+                </Card>
 
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardDescription>Total Projects</CardDescription>
+                    <CardTitle className="text-3xl text-orange-600">
+                      {stats.totalProjects}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600">
+                      Across all locations
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Quick Actions</CardTitle>
+                    <CardDescription>
+                      Get started with investments
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <Link href="/plots">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Browse Available Plots
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <Link href="/dashboard/bookings">
+                        <FileText className="mr-2 h-4 w-4" />
+                        View My Bookings
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <Link href="/projects">
+                        <Home className="mr-2 h-4 w-4" />
+                        Explore Projects
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-[#5c8a75]">
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      Investment Journey
+                    </CardTitle>
+                    <CardDescription>How it works</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li className="flex items-start">
+                        <span className="mr-2 text-[#5c8a75]">1.</span>
+                        <span>Browse available plots and projects</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2 text-[#5c8a75]">2.</span>
+                        <span>Submit a booking request</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2 text-[#5c8a75]">3.</span>
+                        <span>Wait for admin approval</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2 text-[#5c8a75]">4.</span>
+                        <span>Complete payment</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="mr-2 text-[#5c8a75]">5.</span>
+                        <span>Track your investment</span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Welcome Message */}
               <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Total Projects</CardDescription>
-                  <CardTitle className="text-3xl text-amber-600">
-                    {stats.totalPlots}
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Welcome to Nestline Capital
                   </CardTitle>
+                  <CardDescription>
+                    Your gateway to smart land investments
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600">Across all locations</p>
+                  <p className="text-sm text-gray-600">
+                    Start exploring our curated selection of premium plots
+                    across multiple projects. Our team is here to help you make
+                    informed investment decisions.
+                  </p>
                 </CardContent>
               </Card>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>What would you like to do?</CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  asChild
-                  className="bg-[#5c8a75] hover:bg-[#4a6f5f] h-auto py-4"
-                >
-                  <Link href="/dashboard/plots">
-                    <div className="flex items-start gap-3 text-left">
-                      <MapPin className="w-5 h-5 mt-1" />
-                      <div>
-                        <div className="font-medium">
-                          Browse Available Plots
-                        </div>
-                        <div className="text-xs opacity-90 font-normal">
-                          Explore opportunities
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </Button>
-
-                <Button asChild variant="outline" className="h-auto py-4">
-                  <Link href="/dashboard/my-bookings">
-                    <div className="flex items-start gap-3 text-left">
-                      <FileText className="w-5 h-5 mt-1" />
-                      <div>
-                        <div className="font-medium">View My Bookings</div>
-                        <div className="text-xs text-gray-500 font-normal">
-                          Track investments
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="mt-6 border-[#5c8a75] border-l-4">
-              <CardHeader>
-                <CardTitle className="text-base">Getting Started</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-gray-600">
-                <p>1. Browse available plots in our projects</p>
-                <p>2. Select and initiate booking</p>
-                <p>3. Upload payment proof</p>
-                <p>4. Receive documentation</p>
-              </CardContent>
-            </Card>
           </main>
         </div>
       </div>

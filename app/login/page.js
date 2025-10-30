@@ -1,9 +1,8 @@
-// File: app/login/page.js
-// Login page - user authentication with email/password
+// app/login/page.js
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,11 +19,26 @@ import {
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const getRoleBasedRedirect = (role) => {
+    // If there's a specific callback URL, use that
+    if (callbackUrl) return callbackUrl;
+
+    // Otherwise, redirect based on role
+    switch (role) {
+      case "admin":
+        return "/admin";
+      case "editor":
+        return "/editor/dashboard";
+      default:
+        return "/dashboard";
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,32 +54,51 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError(result.error);
+        setLoading(false);
       } else {
-        router.push(callbackUrl);
-        router.refresh();
+        // Fetch the session to get user role
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+
+        if (session?.user?.role) {
+          const redirectUrl = getRoleBasedRedirect(session.user.role);
+          router.push(redirectUrl);
+          router.refresh();
+        } else {
+          // Fallback if role not found
+          router.push("/dashboard");
+          router.refresh();
+        }
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f6f8f7] to-white p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-[#5c8a75]">
-            Nestline Capital
-          </h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome Back</CardTitle>
+        <Card className="border-t-4 border-t-[#5c8a75]">
+          <CardHeader className="space-y-1 text-center">
+            <div className="mx-auto w-16 h-16 bg-[#5c8a75] rounded-full flex items-center justify-center mb-4">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account
+              Sign in to your Nestline Capital account
             </CardDescription>
           </CardHeader>
 
@@ -87,12 +120,13 @@ export default function LoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="name@example.com"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                  disabled={loading}
                 />
               </div>
 
@@ -106,7 +140,7 @@ export default function LoginPage() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-[#5c8a75] hover:text-[#4a6f5f]"
+                    className="text-xs text-[#5c8a75] hover:text-[#4a6f5f]"
                   >
                     Forgot password?
                   </Link>
@@ -120,13 +154,14 @@ export default function LoginPage() {
                     setFormData({ ...formData, password: e.target.value })
                   }
                   required
+                  disabled={loading}
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#5c8a75] hover:bg-[#4a6f5f] text-white"
+                className="w-full bg-[#5c8a75] hover:bg-[#4a6f5f]"
               >
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
@@ -135,7 +170,7 @@ export default function LoginPage() {
 
           <CardFooter>
             <p className="text-sm text-center text-gray-600 w-full">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/register"
                 className="text-[#5c8a75] hover:text-[#4a6f5f] font-medium"

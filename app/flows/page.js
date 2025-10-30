@@ -107,7 +107,7 @@ export default function UserFlows() {
                     Must register to inquire
                   </p>
                   <p className="text-sm text-gray-600">
-                    Sees "Sign up to continue" CTA
+                    Sees &quot;Sign up to continue&quot; CTA
                   </p>
                 </div>
               </div>
@@ -222,8 +222,8 @@ export default function UserFlows() {
                   <div className="flex-1">
                     <div className="font-medium">Pending Review</div>
                     <p className="text-sm text-gray-600">
-                      Admin receives email notification, user sees "Under
-                      Review" status
+                      Admin receives email notification, user sees &quot;Under
+                      Review&quot; status
                     </p>
                   </div>
                 </div>
@@ -248,8 +248,8 @@ export default function UserFlows() {
                   <div className="flex-1">
                     <div className="font-medium">Approved → Upgraded User</div>
                     <p className="text-sm text-gray-600">
-                      User upgraded to "Purchased User", gains access to
-                      ownership portal
+                      User upgraded to &quot;Purchased User&quot;, gains access
+                      to ownership portal
                     </p>
                   </div>
                 </div>

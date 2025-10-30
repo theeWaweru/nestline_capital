@@ -1,302 +1,300 @@
-// =============================================================================
-// 1. app/admin/plots/page.js - Main plot inventory page
-// =============================================================================
+// app/admin/plots/page.js
 "use client";
 
-import { useState, useEffect } from "react";
-import Sidebar from "@/components/admin/Sidebar";
-import Header from "@/components/admin/Header";
-import PlotTable from "@/components/admin/PlotTable";
-import PlotFilters from "@/components/admin/PlotFilters";
-import PlotStats from "@/components/admin/PlotStats";
-import GoogleMap from "@/components/maps/google-map";
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, MoreVertical, Edit, Trash2, Eye, Filter } from "lucide-react";
 
-export default function PlotInventoryPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const statusColors = {
+  draft: "bg-gray-100 text-gray-800",
+  available: "bg-green-100 text-green-800",
+  processing: "bg-yellow-100 text-yellow-800",
+  booked: "bg-blue-100 text-blue-800",
+};
+
+const statusLabels = {
+  draft: "Draft",
+  available: "Available",
+  processing: "Processing",
+  booked: "Booked",
+};
+
+export default function PlotsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [plots, setPlots] = useState([]);
-  const [filteredPlots, setFilteredPlots] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("table"); // 'table' or 'map'
-  const [selectedPlots, setSelectedPlots] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(
+    searchParams.get("project") || "all"
+  );
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
-  // Filter states
-  const [filters, setFilters] = useState({
-    project: "",
-    status: "",
-    priceRange: [0, 10000000],
-    sizeRange: [0, 5],
-    search: "",
-  });
-
-  // Fetch data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [plotsRes, projectsRes] = await Promise.all([
-          fetch("/api/plots"),
-          fetch("/api/projects"),
-        ]);
+    if (status === "loading") return;
 
-        const plotsData = await plotsRes.json();
-        const projectsData = await projectsRes.json();
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (
+      session?.user?.role !== "admin" &&
+      session?.user?.role !== "editor"
+    ) {
+      router.push("/dashboard");
+    } else {
+      fetchProjects();
+      fetchPlots();
+    }
+  }, [status, session, router, fetchProjects, fetchPlots]);
 
-        setPlots(plotsData);
-        setFilteredPlots(plotsData);
-        setProjects(projectsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+  useEffect(() => {
+    fetchPlots();
+  }, [fetchPlots]);
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/projects");
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
       }
-    };
-
-    fetchData();
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
   }, []);
 
-  // Apply filters
-  useEffect(() => {
-    let filtered = plots;
+  const fetchPlots = useCallback(async () => {
+    try {
+      setLoading(true);
+      let url = "/api/admin/plots?";
 
-    // Project filter
-    if (filters.project) {
-      filtered = filtered.filter((plot) => plot.projectId === filters.project);
+      if (selectedProject !== "all") {
+        url += `project=${selectedProject}&`;
+      }
+      if (selectedStatus !== "all") {
+        url += `status=${selectedStatus}&`;
+      }
+
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setPlots(data);
+      }
+    } catch (error) {
+      console.error("Error fetching plots:", error);
+    } finally {
+      setLoading(false);
     }
+  }, [selectedProject, selectedStatus]);
 
-    // Status filter
-    if (filters.status) {
-      filtered = filtered.filter((plot) => plot.status === filters.status);
-    }
-
-    // Price range filter
-    filtered = filtered.filter(
-      (plot) =>
-        plot.price >= filters.priceRange[0] &&
-        plot.price <= filters.priceRange[1]
-    );
-
-    // Size range filter
-    filtered = filtered.filter(
-      (plot) =>
-        plot.sizeInAcres >= filters.sizeRange[0] &&
-        plot.sizeInAcres <= filters.sizeRange[1]
-    );
-
-    // Search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(
-        (plot) =>
-          plot.plotId.toLowerCase().includes(searchLower) ||
-          plot.location.toLowerCase().includes(searchLower) ||
-          plot.block.toLowerCase().includes(searchLower)
-      );
-    }
-
-    setFilteredPlots(filtered);
-  }, [plots, filters]);
-
-  const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters });
-  };
-
-  const handlePlotSelect = (plotId, selected) => {
-    if (selected) {
-      setSelectedPlots([...selectedPlots, plotId]);
-    } else {
-      setSelectedPlots(selectedPlots.filter((id) => id !== plotId));
-    }
-  };
-
-  const handleSelectAll = (selected) => {
-    if (selected) {
-      setSelectedPlots(filteredPlots.map((plot) => plot._id));
-    } else {
-      setSelectedPlots([]);
-    }
-  };
-
-  const handleBulkAction = async (action) => {
-    if (selectedPlots.length === 0) return;
+  const handleDelete = async (id, plotNumber) => {
+    if (!confirm(`Are you sure you want to delete plot ${plotNumber}?`)) return;
 
     try {
-      const response = await fetch("/api/plots/bulk", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          plotIds: selectedPlots,
-          action,
-        }),
+      const response = await fetch(`/api/admin/plots/${id}`, {
+        method: "DELETE",
       });
 
       if (response.ok) {
-        // Refresh data
-        const plotsRes = await fetch("/api/plots");
-        const plotsData = await plotsRes.json();
-        setPlots(plotsData);
-        setSelectedPlots([]);
+        fetchPlots();
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to delete plot");
       }
     } catch (error) {
-      console.error("Error performing bulk action:", error);
+      console.error("Error deleting plot:", error);
+      alert("Failed to delete plot");
     }
   };
 
-  const handleExport = async (format) => {
-    try {
-      const params = new URLSearchParams({
-        format,
-        ...filters,
-      });
-
-      const response = await fetch(`/api/export/plots?${params}`);
-      const blob = await response.blob();
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `plots-export.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error("Error exporting data:", error);
-    }
-  };
-
-  if (loading) {
+  if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading-spinner"></div>
-          <p className="mt-4 text-gray-600">Loading plot inventory...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="admin-dashboard">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Plots</h1>
+          <p className="text-gray-600 mt-1">Manage individual land plots</p>
+        </div>
+        <Button asChild className="bg-[#5c8a75] hover:bg-[#4a6f5f]">
+          <Link href="/admin/plots/new">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Plot
+          </Link>
+        </Button>
+      </div>
 
-      <div className="admin-main">
-        <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      {/* Filters */}
+      <div className="flex gap-4 mb-6">
+        <div className="flex-1">
+          <Select value={selectedProject} onValueChange={setSelectedProject}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by project" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
+              {projects.map((project) => (
+                <SelectItem key={project._id} value={project._id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <main className="p-6">
-          {/* Page header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Plot Inventory Management
-              </h2>
-              <p className="text-gray-600">
-                Monitor plot availability, track status changes, and manage
-                inventory across all development phases
-              </p>
+        <div className="flex-1">
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="available">Available</SelectItem>
+              <SelectItem value="processing">Processing</SelectItem>
+              <SelectItem value="booked">Booked</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Plots Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {plots.length} {plots.length === 1 ? "Plot" : "Plots"}
+          </CardTitle>
+          <CardDescription>View and manage all land plots</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin w-8 h-8 border-4 border-[#5c8a75] border-t-transparent rounded-full"></div>
             </div>
-
-            <div className="flex gap-3 mt-4 md:mt-0">
-              <button
-                onClick={() => handleExport("csv")}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2"
-              >
-                📊 Export
-              </button>
-              <button className="px-4 py-2 bg-sage-500 text-white rounded-lg hover:bg-sage-600 flex items-center gap-2">
-                ➕ Add Plot
-              </button>
-              <a href="/admin/projects/new">New plot</a>
+          ) : plots.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 mb-4">No plots found</p>
+              <Button asChild variant="outline">
+                <Link href="/admin/plots/new">Create your first plot</Link>
+              </Button>
             </div>
-          </div>
-
-          {/* Stats overview */}
-          <PlotStats plots={filteredPlots} />
-
-          {/* Filters */}
-          <PlotFilters
-            projects={projects}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            plotCount={filteredPlots.length}
-            totalCount={plots.length}
-          />
-
-          {/* View toggle */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setView("table")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    view === "table"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  📋 Plot Inventory
-                </button>
-                <button
-                  onClick={() => setView("map")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    view === "map"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  🗺️ Plot Locations
-                </button>
-              </div>
-
-              {selectedPlots.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">
-                    {selectedPlots.length} selected
-                  </span>
-                  <select
-                    onChange={(e) => handleBulkAction(e.target.value)}
-                    className="text-sm border border-gray-300 rounded px-3 py-1"
-                    defaultValue=""
-                  >
-                    <option value="">Bulk Actions</option>
-                    <option value="mark-available">Mark as Available</option>
-                    <option value="mark-hold">Put on Hold</option>
-                    <option value="export-selected">Export Selected</option>
-                  </select>
-                </div>
-              )}
-            </div>
-
-            <div className="text-sm text-gray-500">
-              Showing {filteredPlots.length} of {plots.length} plots
-            </div>
-          </div>
-
-          {/* Content */}
-          {view === "table" ? (
-            <PlotTable
-              plots={filteredPlots}
-              projects={projects}
-              selectedPlots={selectedPlots}
-              onPlotSelect={handlePlotSelect}
-              onSelectAll={handleSelectAll}
-            />
           ) : (
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-              <div className="map-container h-96">
-                <GoogleMap
-                  plots={filteredPlots}
-                  center={{ lat: -3.2207, lng: 40.1173 }}
-                  zoom={10}
-                  onPlotClick={(plot) => console.log("Clicked plot:", plot)}
-                  className="w-full h-full"
-                />
-              </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Plot Number</TableHead>
+                    <TableHead>Project</TableHead>
+                    <TableHead>Size</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Visibility</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {plots.map((plot) => (
+                    <TableRow key={plot._id}>
+                      <TableCell className="font-medium">
+                        #{plot.plotNumber}
+                      </TableCell>
+                      <TableCell>{plot.project?.name || "—"}</TableCell>
+                      <TableCell>{plot.size}</TableCell>
+                      <TableCell>KES {plot.price.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge className={statusColors[plot.status]}>
+                          {statusLabels[plot.status]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {plot.visibility ? (
+                          <span className="text-green-600 text-sm">
+                            ✓ Visible
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-sm">Hidden</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/plots/${plot._id}`}>
+                                <Eye className="w-4 h-4 mr-2" />
+                                View Details
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/plots/${plot._id}/edit`}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </Link>
+                            </DropdownMenuItem>
+                            {session?.user?.role === "admin" && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleDelete(plot._id, plot.plotNumber)
+                                }
+                                className="text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
-        </main>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

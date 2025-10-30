@@ -53,7 +53,7 @@ export default function EditorDashboard() {
       session?.user?.role !== "editor" &&
       session?.user?.role !== "admin"
     ) {
-      router.push("/dashboard");
+      router.push("/editor");
     }
   }, [status, session, router]);
 

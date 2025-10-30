@@ -108,7 +108,7 @@ export default function RegisterPage() {
             </div>
             <CardTitle>Check Your Email</CardTitle>
             <CardDescription className="mt-2">
-              We've sent a verification link to{" "}
+              We&apos;ve sent a verification link to{" "}
               <strong>{formData.email}</strong>
             </CardDescription>
           </CardHeader>
