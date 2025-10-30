@@ -1,6 +1,7 @@
 // app/login/page.js
 "use client";
 
+import { Suspense } from "react";
 import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,7 +17,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function LoginPage() {
+// Separate component that uses useSearchParams
+function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
@@ -182,5 +184,28 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// Loading fallback component
+function LoginPageLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-sm text-gray-600">Loading...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function Login() {
+  return (
+    <Suspense fallback={<LoginPageLoading />}>
+      <LoginPage />
+    </Suspense>
   );
 }

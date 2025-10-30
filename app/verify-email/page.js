@@ -2,6 +2,7 @@
 // Email verification page - processes token from email link
 "use client";
 
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -15,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function VerifyEmailPage() {
+function VerifyEmailPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState("verifying");
@@ -150,5 +151,28 @@ export default function VerifyEmailPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+// Loading fallback component
+function VerifyEmailLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-sm text-gray-600">Loading...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function VerifyEmail() {
+  return (
+    <Suspense fallback={<VerifyEmailLoading />}>
+      <VerifyEmailPage />
+    </Suspense>
   );
 }
