@@ -1,5 +1,4 @@
 // File: app/admin/page.js
-// Admin dashboard - full system control panel
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,6 +15,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarTrigger,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
 } from "@/components/ui/sidebar";
 import {
   Card,
@@ -45,6 +47,8 @@ import {
   UserPlus,
   BarChart3,
   Shield,
+  Building2,
+  Mail,
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -77,102 +81,125 @@ export default function AdminDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        <Sidebar>
-          <SidebarHeader>
-            <div className="px-4 py-3">
-              <h1 className="text-xl font-semibold text-[#5c8a75]">
-                Nestline Admin
-              </h1>
-              <p className="text-xs text-gray-500">Full Control Panel</p>
+      <div className="flex min-h-screen w-full bg-gray-50">
+        {/* Sidebar */}
+        <Sidebar className="border-r">
+          <SidebarHeader className="border-b px-6 py-4">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-6 h-6 text-[#5c8a75]" />
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">
+                  Nestline Capital
+                </h1>
+                <p className="text-xs text-gray-500">Admin Dashboard</p>
+              </div>
             </div>
           </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/dashboard">
-                    <Home className="w-4 h-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+          <SidebarContent className="px-3 py-4">
+            <SidebarGroup>
+              <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive>
+                      <Link href="/admin">
+                        <Home className="w-4 h-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/plots">
-                    <MapPin className="w-4 h-4" />
-                    <span>Plot Management</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/plots">
+                        <MapPin className="w-4 h-4" />
+                        <span>Plot Management</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/users">
-                    <Users className="w-4 h-4" />
-                    <span>User Management</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/bookings">
+                        <FileText className="w-4 h-4" />
+                        <span>Bookings</span>
+                        {stats.pendingBookings > 0 && (
+                          <Badge className="ml-auto bg-red-500 text-white hover:bg-red-600">
+                            {stats.pendingBookings}
+                          </Badge>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/editors">
-                    <UserPlus className="w-4 h-4" />
-                    <span>Invite Editors</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarGroup>
+              <SidebarGroupLabel>Management</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/users">
+                        <Users className="w-4 h-4" />
+                        <span>Users</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/bookings">
-                    <FileText className="w-4 h-4" />
-                    <span>Bookings</span>
-                    {stats.pendingBookings > 0 && (
-                      <Badge className="ml-auto bg-red-500">
-                        {stats.pendingBookings}
-                      </Badge>
-                    )}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/editors">
+                        <UserPlus className="w-4 h-4" />
+                        <span>Invite Editors</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/analytics">
-                    <BarChart3 className="w-4 h-4" />
-                    <span>Analytics</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/analytics">
+                        <BarChart3 className="w-4 h-4" />
+                        <span>Analytics</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link href="/admin/settings">
-                    <Settings className="w-4 h-4" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
+            <SidebarGroup>
+              <SidebarGroupLabel>Settings</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link href="/admin/settings">
+                        <Settings className="w-4 h-4" />
+                        <span>Settings</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter>
+          <SidebarFooter className="border-t p-4">
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton className="w-full">
                       <Avatar className="w-8 h-8">
-                        <AvatarFallback className="bg-[#5c8a75] text-white">
+                        <AvatarFallback className="bg-[#5c8a75] text-white text-sm">
                           {session?.user?.name?.charAt(0) || "A"}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col items-start text-left flex-1">
-                        <span className="text-sm font-medium">
+                      <div className="flex flex-col items-start text-left flex-1 min-w-0">
+                        <span className="text-sm font-medium truncate w-full">
                           {session?.user?.name}
                         </span>
                         <span className="text-xs text-gray-500">
@@ -181,7 +208,7 @@ export default function AdminDashboard() {
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuContent className="w-56" align="end" side="top">
                     <DropdownMenuLabel>Admin Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
@@ -193,6 +220,7 @@ export default function AdminDashboard() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => signOut({ callbackUrl: "/login" })}
+                      className="text-red-600"
                     >
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign Out
@@ -204,15 +232,19 @@ export default function AdminDashboard() {
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col">
-          <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-4">
-              <SidebarTrigger />
+              <SidebarTrigger className="lg:hidden" />
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Admin Dashboard
+                  Dashboard Overview
                 </h2>
-                <p className="text-sm text-gray-600">Complete system control</p>
+                <p className="text-sm text-gray-600">
+                  Welcome back, {session?.user?.name}
+                </p>
               </div>
             </div>
 
@@ -222,7 +254,9 @@ export default function AdminDashboard() {
             </Badge>
           </header>
 
-          <main className="flex-1 p-6 bg-gray-50">
+          {/* Content Area - Scrollable */}
+          <main className="flex-1 p-6 overflow-y-auto">
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
                 <CardHeader className="pb-3">
@@ -235,13 +269,13 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2 text-sm">
                     <Badge
                       variant="secondary"
-                      className="bg-emerald-100 text-emerald-800"
+                      className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100"
                     >
                       {stats.available} Available
                     </Badge>
                     <Badge
                       variant="secondary"
-                      className="bg-rose-100 text-rose-800"
+                      className="bg-rose-100 text-rose-800 hover:bg-rose-100"
                     >
                       {stats.sold} Sold
                     </Badge>
@@ -258,7 +292,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600">
-                    {stats.editors} active editors
+                    {stats.editors} editors active
                   </p>
                 </CardContent>
               </Card>
@@ -266,68 +300,24 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader className="pb-3">
                   <CardDescription>Pending Bookings</CardDescription>
-                  <CardTitle className="text-3xl text-amber-600">
+                  <CardTitle className="text-3xl text-orange-600">
                     {stats.pendingBookings}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-600">Require review</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button
-                    asChild
-                    className="w-full bg-[#5c8a75] hover:bg-[#4a6f5f]"
-                  >
-                    <Link href="/admin/editors">
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Invite Editor
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link href="/admin/plots">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      Add New Plot
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link href="/admin/users">
-                      <Users className="w-4 h-4 mr-2" />
-                      Manage Users
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="border-amber-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <span className="text-amber-600">⚠</span>
-                    Needs Attention
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {stats.pendingBookings > 0 ? (
                     <Button
-                      asChild
+                      size="sm"
                       variant="outline"
-                      className="w-full justify-start"
+                      className="w-full"
+                      asChild
                     >
                       <Link href="/admin/bookings">
-                        <FileText className="w-4 h-4 mr-2" />
-                        {stats.pendingBookings} Pending Booking
-                        {stats.pendingBookings !== 1 ? "s" : ""}
+                        Review Booking{stats.pendingBookings > 1 ? "s" : ""}
                       </Link>
                     </Button>
                   ) : (
-                    <p className="text-sm text-gray-500 py-4 text-center">
+                    <p className="text-sm text-gray-500 py-2 text-center">
                       All caught up! 🎉
                     </p>
                   )}
@@ -335,23 +325,134 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            <Card className="border-[#5c8a75] border-l-4">
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Quick Actions</CardTitle>
+                  <CardDescription>
+                    Common administrative tasks
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link href="/admin/plots/new">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      Add New Plot
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link href="/admin/editors">
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Invite Editor
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    asChild
+                  >
+                    <Link href="/admin/analytics">
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      View Reports
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-[#5c8a75] border-l-4">
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Admin Capabilities
+                  </CardTitle>
+                  <CardDescription>What you can do</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>Create, edit, delete all content</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>Invite and manage editors</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>Approve/reject bookings</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>Manage user accounts</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>View analytics & reports</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-[#5c8a75] mr-2">✓</span>
+                      <span>Configure system settings</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* System Status */}
+            <Card>
               <CardHeader>
-                <CardTitle className="text-base">Admin Capabilities</CardTitle>
+                <CardTitle className="text-base">System Status</CardTitle>
+                <CardDescription>All systems operational</CardDescription>
               </CardHeader>
-              <CardContent className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                <ul className="space-y-2">
-                  <li>✓ Create, edit, delete all content</li>
-                  <li>✓ Invite and manage editors</li>
-                  <li>✓ Approve/reject bookings</li>
-                  <li>✓ Manage user accounts</li>
-                </ul>
-                <ul className="space-y-2">
-                  <li>✓ View analytics</li>
-                  <li>✓ Configure settings</li>
-                  <li>✓ Access audit logs</li>
-                  <li>✓ Full database access</li>
-                </ul>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Database</span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                    >
+                      Connected
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">Email Service</span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                    >
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium">
+                        Authentication
+                      </span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                    >
+                      Secured
+                    </Badge>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </main>
