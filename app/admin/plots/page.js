@@ -63,26 +63,6 @@ export default function PlotsPage() {
   );
   const [selectedStatus, setSelectedStatus] = useState("all");
 
-  useEffect(() => {
-    if (status === "loading") return;
-
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (
-      session?.user?.role !== "admin" &&
-      session?.user?.role !== "editor"
-    ) {
-      router.push("/dashboard");
-    } else {
-      fetchProjects();
-      fetchPlots();
-    }
-  }, [status, session, router, fetchProjects, fetchPlots]);
-
-  useEffect(() => {
-    fetchPlots();
-  }, [fetchPlots]);
-
   const fetchProjects = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/projects");
@@ -118,6 +98,26 @@ export default function PlotsPage() {
       setLoading(false);
     }
   }, [selectedProject, selectedStatus]);
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (
+      session?.user?.role !== "admin" &&
+      session?.user?.role !== "editor"
+    ) {
+      router.push("/dashboard");
+    } else {
+      fetchProjects();
+      fetchPlots();
+    }
+  }, [status, session, router, fetchProjects, fetchPlots]);
+
+  useEffect(() => {
+    fetchPlots();
+  }, [fetchPlots]);
 
   const handleDelete = async (id, plotNumber) => {
     if (!confirm(`Are you sure you want to delete plot ${plotNumber}?`)) return;

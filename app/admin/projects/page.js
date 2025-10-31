@@ -49,18 +49,6 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    if (status === "loading") return;
-
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (session?.user?.role !== "admin") {
-      router.push("/dashboard");
-    } else {
-      fetchProjects();
-    }
-  }, [status, session, router, fetchProjects]);
-
   const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
@@ -80,6 +68,17 @@ export default function ProjectsPage() {
       setLoading(false);
     }
   }, [filter]);
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/login");
+    } else if (session?.user?.role !== "admin") {
+      router.push("/dashboard");
+    } else {
+      fetchProjects();
+    }
+  }, [status, session, router, fetchProjects]);
 
   const handleDelete = async (id, name) => {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
