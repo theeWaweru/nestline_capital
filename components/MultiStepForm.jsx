@@ -10,12 +10,14 @@ import { cn } from "@/lib/utils";
 /**
  * MultiStepForm Component
  * Handles multi-step form logic with progress indicator
- * 
+ *
  * @param {Object} props
  * @param {Array} props.steps - Array of step objects: [{ title, description, component }]
  * @param {Function} props.onSubmit - Called when form is submitted
  * @param {Function} props.onCancel - Called when cancel is clicked
+ * @param {Function} props.onSaveDraft - Called when save draft is clicked (optional)
  * @param {boolean} props.isSubmitting - Loading state for submit button
+ * @param {boolean} props.isSavingDraft - Loading state for save draft button
  * @param {Object} props.formData - Current form data
  * @param {Function} props.updateFormData - Function to update form data
  */
@@ -23,7 +25,9 @@ export default function MultiStepForm({
     steps,
     onSubmit,
     onCancel,
+    onSaveDraft,
     isSubmitting = false,
+    isSavingDraft = false,
     formData,
     updateFormData,
 }) {
@@ -140,13 +144,23 @@ export default function MultiStepForm({
                                     type="button"
                                     variant="ghost"
                                     onClick={onCancel}
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || isSavingDraft}
                                 >
                                     Cancel
                                 </Button>
+                                {onSaveDraft && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={onSaveDraft}
+                                        disabled={isSubmitting || isSavingDraft}
+                                    >
+                                        {isSavingDraft ? "Saving Draft..." : "Save Draft"}
+                                    </Button>
+                                )}
                                 <Button
                                     type="submit"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || isSavingDraft}
                                     className="bg-[#5c8a75] hover:bg-[#4a6f5f]"
                                 >
                                     {isSubmitting ? (
