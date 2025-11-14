@@ -15,6 +15,7 @@ export default function GoogleMap({
   className = "",
 }) {
   const mapRef = useRef(null);
+  const markersRef = useRef([]);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [mapType, setMapType] = useState("roadmap");
@@ -54,13 +55,14 @@ export default function GoogleMap({
     if (mapRef.current && !map) {
       initMap();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center, zoom, mapType]);
 
   // Update markers when plots change
   useEffect(() => {
     if (map && plots.length > 0) {
       // Clear existing markers
-      markers.forEach((marker) => marker.setMap(null));
+      markersRef.current.forEach((marker) => marker.setMap(null));
 
       // Create new markers
       const newMarkers = plots.map((plot) => {
@@ -73,6 +75,7 @@ export default function GoogleMap({
         return marker;
       });
 
+      markersRef.current = newMarkers;
       setMarkers(newMarkers);
 
       // Fit map to show all plots
