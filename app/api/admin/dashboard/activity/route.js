@@ -38,8 +38,8 @@ export async function GET(request) {
         .populate("createdBy", "name")
         .lean(),
 
-      // Recent investors
-      User.find({ role: "investor" })
+      // Recent investors (users with role: 'user')
+      User.find({ role: "user" })
         .sort({ createdAt: -1 })
         .limit(5)
         .select("name email createdAt")
