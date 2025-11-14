@@ -1,9 +1,9 @@
-// app/not-found.js
+// app/unauthorized/page.js
 "use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FileQuestion, Home, ArrowLeft } from "lucide-react";
+import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function NotFound() {
+export default function UnauthorizedPage() {
   const router = useRouter();
 
   return (
@@ -22,23 +22,19 @@ export default function NotFound() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-4 bg-sage-100 rounded-full">
-              <FileQuestion className="w-12 h-12 text-sage-600" />
+            <div className="p-4 bg-red-100 rounded-full">
+              <ShieldAlert className="w-12 h-12 text-red-600" />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Page Not Found
+            Access Denied
           </CardTitle>
           <CardDescription className="text-base mt-2">
-            The page you're looking for doesn't exist
+            You don't have permission to access this page
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="text-center">
-            <p className="text-6xl font-bold text-sage-200">404</p>
-          </div>
-
           <div className="bg-sage-50 border border-sage-200 rounded-lg p-4">
             <h3 className="font-semibold text-sage-900 mb-2">
               Why am I seeing this?
@@ -46,49 +42,29 @@ export default function NotFound() {
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <span className="text-sage-600 mt-0.5">•</span>
-                <span>The page may have been moved or deleted</span>
+                <span>You may not have the required role to access this page</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-sage-600 mt-0.5">•</span>
-                <span>The URL might be typed incorrectly</span>
+                <span>Your session may have expired</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-sage-600 mt-0.5">•</span>
-                <span>The link you followed might be broken</span>
+                <span>You may need to log in with a different account</span>
               </li>
             </ul>
           </div>
 
-          <div className="bg-cream border border-sage-200 rounded-lg p-4">
-            <h3 className="font-semibold text-sage-900 mb-3">
-              Quick Links
-            </h3>
-            <div className="space-y-2">
-              <Link
-                href="/"
-                className="block text-sm text-sage-600 hover:text-sage-700 hover:underline"
+          <div className="text-center text-sm text-gray-600">
+            <p>
+              If you believe this is an error, please contact{" "}
+              <a
+                href="mailto:support@nestlinecapital.com"
+                className="text-sage-600 hover:text-sage-700 underline"
               >
-                → Home
-              </Link>
-              <Link
-                href="/projects"
-                className="block text-sm text-sage-600 hover:text-sage-700 hover:underline"
-              >
-                → Browse Projects
-              </Link>
-              <Link
-                href="/about"
-                className="block text-sm text-sage-600 hover:text-sage-700 hover:underline"
-              >
-                → About Us
-              </Link>
-              <Link
-                href="/services"
-                className="block text-sm text-sage-600 hover:text-sage-700 hover:underline"
-              >
-                → Our Services
-              </Link>
-            </div>
+                support@nestlinecapital.com
+              </a>
+            </p>
           </div>
         </CardContent>
 
