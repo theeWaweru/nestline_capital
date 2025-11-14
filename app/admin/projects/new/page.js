@@ -12,12 +12,13 @@ import PurchaseSettingsStep from "@/components/project-form/PurchaseSettingsStep
 export default function NewProjectPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     location: "",
     totalLandSize: "",
     description: "",
-    status: "planning",
+    status: "draft",
     planningStartDate: null,
     developmentStartDate: null,
     completionDate: null,
@@ -62,12 +63,15 @@ export default function NewProjectPage() {
     setIsSubmitting(true);
 
     try {
+      // Set status to planning when creating full project
+      const projectData = { ...formData, status: "planning" };
+
       const response = await fetch("/api/admin/projects", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(projectData),
       });
 
       if (!response.ok) {
@@ -84,6 +88,39 @@ export default function NewProjectPage() {
       alert(error.message || "Failed to create project. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    setIsSavingDraft(true);
+
+    try {
+      // Save with draft status
+      const draftData = { ...formData, status: "draft" };
+
+      const response = await fetch("/api/admin/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draftData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save draft");
+      }
+
+      const project = await response.json();
+
+      alert("Draft saved successfully! You can continue editing later.");
+      // Redirect to projects list
+      router.push("/admin/projects");
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      alert(error.message || "Failed to save draft. Please try again.");
+    } finally {
+      setIsSavingDraft(false);
     }
   };
 
@@ -114,7 +151,9 @@ export default function NewProjectPage() {
         updateFormData={updateFormData}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
+        onSaveDraft={handleSaveDraft}
         isSubmitting={isSubmitting}
+        isSavingDraft={isSavingDraft}
       />
     </div>
   );
