@@ -5,6 +5,8 @@ import connectDB from "@/lib/database";
 import Project from "@/lib/models/Project";
 import Plot from "@/lib/models/Plot";
 import User from "@/lib/models/User";
+import Payment from "@/lib/models/Payment";
+import Booking from "@/lib/models/Booking";
 
 export async function GET(request) {
   try {
@@ -26,6 +28,9 @@ export async function GET(request) {
       plotsByStatus,
       totalInvestors,
       recentInvestors,
+      pendingPayments,
+      verifiedPayments,
+      totalBookings,
     ] = await Promise.all([
       // Total projects
       Project.countDocuments(),
@@ -53,14 +58,23 @@ export async function GET(request) {
         },
       ]),
 
-      // Total investors (role: investor)
-      User.countDocuments({ role: "investor" }),
+      // Total investors (role: user)
+      User.countDocuments({ role: "user" }),
 
       // Recent investors (last 30 days)
       User.countDocuments({
-        role: "investor",
+        role: "user",
         createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
       }),
+
+      // Pending payment verifications
+      Payment.countDocuments({ paymentStatus: "pending" }),
+
+      // Verified payments
+      Payment.countDocuments({ paymentStatus: "verified" }),
+
+      // Total bookings
+      Booking.countDocuments(),
     ]);
 
     // Format project stats
@@ -97,11 +111,10 @@ export async function GET(request) {
         total: totalInvestors,
         recent: recentInvestors,
       },
-      // Placeholder for future booking stats
       bookings: {
-        pendingVerification: 0, // Will be implemented in Phase 4
-        verified: 0,
-        total: 0,
+        pendingVerification: pendingPayments,
+        verified: verifiedPayments,
+        total: totalBookings,
       },
     });
   } catch (error) {
