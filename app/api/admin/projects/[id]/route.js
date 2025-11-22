@@ -5,7 +5,22 @@ import connectDB from "@/lib/database";
 import Project from "@/lib/models/Project";
 import Plot from "@/lib/models/Plot";
 
+/**
+ * Small slugify helper (keeps it dependency-free).
+ * Lowercase, trim, replace spaces with hyphens, remove invalid chars.
+ */
+function slugify(str = "") {
+  return String(str)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-");
+}
+
+// ============================
 // GET - Get single project
+// ============================
 export async function GET(request, { params }) {
   try {
     const session = await auth();
@@ -15,7 +30,10 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const project = await Project.findById(params.id)
+    // Await params per App Router API requirements
+    const { id } = await params;
+
+    const project = await Project.findById(id)
       .populate("createdBy", "name email")
       .lean();
 
@@ -23,13 +41,12 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Get plot count
     const plotCount = await Plot.countDocuments({ project: project._id });
 
     return NextResponse.json({
       ...project,
       plotCount,
-      slotsRemaining: project.totalPlots - plotCount,
+      slotsRemaining: Number(project.totalPlots) - plotCount,
     });
   } catch (error) {
     console.error("Get project error:", error);
@@ -40,7 +57,9 @@ export async function GET(request, { params }) {
   }
 }
 
+// ============================
 // PUT - Update project
+// ============================
 export async function PUT(request, { params }) {
   try {
     const session = await auth();
@@ -54,13 +73,14 @@ export async function PUT(request, { params }) {
     await connectDB();
 
     const data = await request.json();
+    const { id } = await params;
 
-    const project = await Project.findById(params.id);
+    const project = await Project.findById(id);
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // If reducing totalPlots, check if it's valid
+    // Prevent invalid totalPlots reduction
     if (data.totalPlots && data.totalPlots < project.totalPlots) {
       const plotCount = await Plot.countDocuments({ project: project._id });
       if (data.totalPlots < plotCount) {
@@ -73,8 +93,28 @@ export async function PUT(request, { params }) {
       }
     }
 
-    // Update project
-    Object.assign(project, data);
+    // --- Ensure required fields exist before saving ---
+    // Preserve existing createdBy if not provided in the update payload
+    if (
+      data.createdBy === undefined ||
+      data.createdBy === null ||
+      data.createdBy === ""
+    ) {
+      data.createdBy = project.createdBy;
+    }
+
+    // Ensure slug exists: prefer incoming, else existing, else generate from name
+    if (!data.slug) {
+      const nameForSlug = data.name || project.name || "";
+      data.slug = project.slug || (nameForSlug ? slugify(nameForSlug) : "");
+    }
+
+    // Merge safely (preserve unspecified fields)
+    Object.assign(project, {
+      ...project.toObject(),
+      ...data,
+    });
+
     await project.save();
 
     return NextResponse.json(project);
@@ -87,7 +127,9 @@ export async function PUT(request, { params }) {
   }
 }
 
+// ============================
 // DELETE - Delete project
+// ============================
 export async function DELETE(request, { params }) {
   try {
     const session = await auth();
@@ -100,12 +142,13 @@ export async function DELETE(request, { params }) {
 
     await connectDB();
 
-    const project = await Project.findById(params.id);
+    const { id } = await params;
+
+    const project = await Project.findById(id);
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Check if project has plots
     const plotCount = await Plot.countDocuments({ project: project._id });
     if (plotCount > 0) {
       return NextResponse.json(

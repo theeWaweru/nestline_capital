@@ -43,10 +43,6 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProject();
-  }, [fetchProject]);
-
   const fetchProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/projects/${params.id}`);
@@ -63,6 +59,10 @@ export default function ProjectDetailPage() {
       setLoading(false);
     }
   }, [params.id, router]);
+  
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject]);
 
   const handleDelete = async () => {
     if (

@@ -68,6 +68,7 @@ export default function ProjectsPage() {
       setLoading(false);
     }
   }, [filter]);
+
   useEffect(() => {
     if (status === "loading") return;
 

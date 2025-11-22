@@ -29,10 +29,6 @@ export default function EditProjectPage() {
     investorNotes: "",
   });
 
-  useEffect(() => {
-    fetchProject();
-  }, [fetchProject]);
-
   const fetchProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/admin/projects/${params.id}`);
@@ -67,7 +63,11 @@ export default function EditProjectPage() {
       setLoading(false);
     }
   }, [params.id, router]);
-}
+
+  useEffect(() => {
+    fetchProject();
+  }, [fetchProject]);
+
 
 const updateFormData = (updates) => {
   setFormData((prev) => ({ ...prev, ...updates }));
@@ -162,3 +162,4 @@ return (
     />
   </div>
 );
+}
