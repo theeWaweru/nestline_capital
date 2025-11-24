@@ -7,7 +7,38 @@ import { MapPin, Info } from "lucide-react";
 
 export default function PlotLocationStep({ formData, updateFormData }) {
     const handleCoordinateChange = (corner, field, value) => {
-        const numValue = value ? parseFloat(value) : "";
+        // Allow empty values
+        if (value === "") {
+            updateFormData({
+                coordinates: {
+                    ...formData.coordinates,
+                    [corner]: {
+                        ...formData.coordinates?.[corner],
+                        [field]: "",
+                    },
+                },
+            });
+            return;
+        }
+
+        const numValue = parseFloat(value);
+
+        // Check if it's a valid number
+        if (isNaN(numValue)) {
+            alert("Please enter a valid number");
+            return;
+        }
+
+        // Validate lat/lng ranges
+        if (field === "lat" && (numValue < -90 || numValue > 90)) {
+            alert("Latitude must be between -90 and 90");
+            return;
+        }
+        if (field === "lng" && (numValue < -180 || numValue > 180)) {
+            alert("Longitude must be between -180 and 180");
+            return;
+        }
+
         updateFormData({
             coordinates: {
                 ...formData.coordinates,

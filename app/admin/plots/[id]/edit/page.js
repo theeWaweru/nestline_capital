@@ -112,6 +112,38 @@ export default function EditPlotPage() {
     },
   ];
 
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  const handleSaveDraft = async () => {
+    setIsSavingDraft(true);
+
+    try {
+      const draftData = { ...formData, status: "draft" };
+
+      const response = await fetch(`/api/admin/plots/${params.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(draftData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save draft");
+      }
+
+      alert("Draft saved successfully!");
+      router.push("/admin/plots");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      alert(error.message || "Failed to save draft. Please try again.");
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
   const handleSubmit = async () => {
     // Validate required fields
     if (!formData.images || formData.images.length < 4) {
