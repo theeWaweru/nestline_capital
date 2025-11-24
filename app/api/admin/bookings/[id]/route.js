@@ -16,7 +16,9 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const booking = await Booking.findById(params.id)
+    const { id } = await params;
+
+    const booking = await Booking.findById(id)
       .populate("investor", "name email phone")
       .populate("plot", "plotNumber size price images")
       .populate("project", "name location paymentCompletionPeriod")
@@ -50,7 +52,10 @@ export async function GET(request, { params }) {
     });
   } catch (error) {
     console.error("Get booking error:", error);
-    return NextResponse.json({ error: "Failed to fetch booking" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch booking" },
+      { status: 500 }
+    );
   }
 }
 
@@ -58,16 +63,24 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const session = await auth();
-    if (!session || (session.user.role !== "admin" && session.user.role !== "editor")) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    if (
+      !session ||
+      (session.user.role !== "admin" && session.user.role !== "editor")
+    ) {
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     await connectDB();
 
+    const { id } = await params;
+
     const data = await request.json();
     const { action, ...updateData } = data;
 
-    const booking = await Booking.findById(params.id);
+    const booking = await Booking.findById(id);
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
@@ -155,12 +168,17 @@ export async function DELETE(request, { params }) {
   try {
     const session = await auth();
     if (!session || session.user.role !== "admin") {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     await connectDB();
 
-    const booking = await Booking.findById(params.id);
+    const { id } = await params;
+
+    const booking = await Booking.findById(id);
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
@@ -202,6 +220,9 @@ export async function DELETE(request, { params }) {
     });
   } catch (error) {
     console.error("Delete booking error:", error);
-    return NextResponse.json({ error: "Failed to delete booking" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete booking" },
+      { status: 500 }
+    );
   }
 }

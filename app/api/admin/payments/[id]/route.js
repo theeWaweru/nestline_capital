@@ -17,7 +17,9 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const payment = await Payment.findById(params.id)
+    const { id } = await params;
+
+    const payment = await Payment.findById(id)
       .populate("investor", "name email phone")
       .populate("plot", "plotNumber size price")
       .populate("booking", "bookingNumber totalAmount amountPaid paymentPlan")
@@ -43,7 +45,10 @@ export async function GET(request, { params }) {
     });
   } catch (error) {
     console.error("Get payment error:", error);
-    return NextResponse.json({ error: "Failed to fetch payment" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch payment" },
+      { status: 500 }
+    );
   }
 }
 
@@ -51,16 +56,24 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const session = await auth();
-    if (!session || (session.user.role !== "admin" && session.user.role !== "editor")) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+    if (
+      !session ||
+      (session.user.role !== "admin" && session.user.role !== "editor")
+    ) {
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     await connectDB();
 
+    const { id } = await params;
+
     const data = await request.json();
     const { action, notes, reason } = data;
 
-    const payment = await Payment.findById(params.id);
+    const payment = await Payment.findById(id);
     if (!payment) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
@@ -76,7 +89,9 @@ export async function PUT(request, { params }) {
         await payment.save({ session: mongoSession });
 
         // Update booking amount paid
-        const booking = await Booking.findById(payment.booking).session(mongoSession);
+        const booking = await Booking.findById(payment.booking).session(
+          mongoSession
+        );
         if (!booking) {
           throw new Error("Booking not found");
         }
@@ -149,12 +164,17 @@ export async function DELETE(request, { params }) {
   try {
     const session = await auth();
     if (!session || session.user.role !== "admin") {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     await connectDB();
 
-    const payment = await Payment.findById(params.id);
+    const { id } = await params;
+
+    const payment = await Payment.findById(id);
     if (!payment) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
@@ -175,6 +195,9 @@ export async function DELETE(request, { params }) {
     });
   } catch (error) {
     console.error("Delete payment error:", error);
-    return NextResponse.json({ error: "Failed to delete payment" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete payment" },
+      { status: 500 }
+    );
   }
 }
