@@ -15,7 +15,9 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const plot = await Plot.findById(params.id)
+    const { id } = await params;
+
+    const plot = await Plot.findById(id)
       .populate("project", "name slug location paymentCompletionPeriod")
       .populate("createdBy", "name email")
       .populate("bookedBy", "name email")
@@ -51,9 +53,11 @@ export async function PUT(request, { params }) {
 
     await connectDB();
 
+    const { id } = await params;
+
     const data = await request.json();
 
-    const plot = await Plot.findById(params.id);
+    const plot = await Plot.findById(id);
     if (!plot) {
       return NextResponse.json({ error: "Plot not found" }, { status: 404 });
     }
@@ -139,7 +143,9 @@ export async function DELETE(request, { params }) {
 
     await connectDB();
 
-    const plot = await Plot.findById(params.id);
+    const { id } = await params;
+
+    const plot = await Plot.findById(id);
     if (!plot) {
       return NextResponse.json({ error: "Plot not found" }, { status: 404 });
     }

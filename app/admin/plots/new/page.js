@@ -115,8 +115,8 @@ export default function NewPlotPage() {
 
       const plot = await response.json();
 
-      // Redirect to plot detail page
-      router.push(`/admin/plots/${plot._id}`);
+      router.push("/admin/plots");
+      router.refresh();
     } catch (error) {
       console.error("Error creating plot:", error);
       alert(error.message || "Failed to create plot. Please try again.");
@@ -156,6 +156,8 @@ export default function NewPlotPage() {
         updateFormData={updateFormData}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
+        onSaveDraft={handleSaveDraft}
+        isSavingDraft={isSavingDraft}
         isSubmitting={isSubmitting}
       />
     </div>

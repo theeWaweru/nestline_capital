@@ -192,6 +192,8 @@ export default function EditPlotPage() {
         updateFormData={updateFormData}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
+        onSaveDraft={handleSaveDraft}
+        isSavingDraft={isSavingDraft}
         isSubmitting={isSubmitting}
       />
     </div>
