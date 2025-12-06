@@ -1,7 +1,7 @@
 // app/admin/plots/[id]/edit/page.js
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import MultiStepForm from "@/components/MultiStepForm";
 import PlotBasicDetailsStep from "@/components/plot-form/PlotBasicDetailsStep";
@@ -38,46 +38,44 @@ export default function EditPlotPage() {
   });
 
   useEffect(() => {
-    fetchPlot();
-  }, [fetchPlot]);
+    const fetchPlot = async () => {
+      try {
+        const response = await fetch(`/api/admin/plots/${params.id}`);
+        if (!response.ok) throw new Error("Failed to fetch plot");
 
-  const fetchPlot = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/admin/plots/${params.id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch plot");
+        const plot = await response.json();
+
+        setFormData({
+          project: plot.project?._id || "",
+          plotNumber: plot.plotNumber || "",
+          size: plot.size || "",
+          price: plot.price || "",
+          images: plot.images || [],
+          titleDeed: plot.titleDeed || null,
+          coordinates: plot.coordinates || {
+            corner1: { lat: "", lng: "" },
+            corner2: { lat: "", lng: "" },
+            corner3: { lat: "", lng: "" },
+            corner4: { lat: "", lng: "" },
+          },
+          infrastructure: plot.infrastructure || "",
+          topography: plot.topography || "",
+          soilType: plot.soilType || "",
+          features: plot.features || "",
+          amenities: plot.amenities || "",
+          developmentStatus: plot.developmentStatus || "",
+          viewOrientation: plot.viewOrientation || "",
+        });
+      } catch (error) {
+        console.error("Error fetching plot:", error);
+        alert("Failed to load plot.");
+        router.push("/admin/plots");
+      } finally {
+        setLoading(false);
       }
-      const plot = await response.json();
+    };
 
-      // Populate form with existing data
-      setFormData({
-        project: plot.project?._id || "",
-        plotNumber: plot.plotNumber || "",
-        size: plot.size || "",
-        price: plot.price || "",
-        images: plot.images || [],
-        titleDeed: plot.titleDeed || null,
-        coordinates: plot.coordinates || {
-          corner1: { lat: "", lng: "" },
-          corner2: { lat: "", lng: "" },
-          corner3: { lat: "", lng: "" },
-          corner4: { lat: "", lng: "" },
-        },
-        infrastructure: plot.infrastructure || "",
-        topography: plot.topography || "",
-        soilType: plot.soilType || "",
-        features: plot.features || "",
-        amenities: plot.amenities || "",
-        developmentStatus: plot.developmentStatus || "",
-        viewOrientation: plot.viewOrientation || "",
-      });
-    } catch (error) {
-      console.error("Error fetching plot:", error);
-      alert("Failed to load plot. Please try again.");
-      router.push("/admin/plots");
-    } finally {
-      setLoading(false);
-    }
+    fetchPlot();
   }, [params.id, router]);
 
   const updateFormData = (updates) => {
@@ -112,40 +110,7 @@ export default function EditPlotPage() {
     },
   ];
 
-  const [isSavingDraft, setIsSavingDraft] = useState(false);
-
-  const handleSaveDraft = async () => {
-    setIsSavingDraft(true);
-
-    try {
-      const draftData = { ...formData, status: "draft" };
-
-      const response = await fetch(`/api/admin/plots/${params.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(draftData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to save draft");
-      }
-
-      alert("Draft saved successfully!");
-      router.push("/admin/plots");
-      router.refresh();
-    } catch (error) {
-      console.error("Error saving draft:", error);
-      alert(error.message || "Failed to save draft. Please try again.");
-    } finally {
-      setIsSavingDraft(false);
-    }
-  };
-
   const handleSubmit = async () => {
-    // Validate required fields
     if (!formData.images || formData.images.length < 4) {
       alert("Please upload at least 4 images");
       return;
@@ -166,24 +131,17 @@ export default function EditPlotPage() {
     try {
       const response = await fetch(`/api/admin/plots/${params.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update plot");
-      }
+      if (!response.ok) throw new Error("Failed to update plot");
 
       const plot = await response.json();
-
-      // Redirect to plot detail page
       router.push(`/admin/plots/${plot._id}`);
     } catch (error) {
       console.error("Error updating plot:", error);
-      alert(error.message || "Failed to update plot. Please try again.");
+      alert(error.message || "Failed to update plot.");
     } finally {
       setIsSubmitting(false);
     }
@@ -209,7 +167,6 @@ export default function EditPlotPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Edit Plot</h1>
         <p className="text-gray-600 mt-2">
@@ -217,15 +174,12 @@ export default function EditPlotPage() {
         </p>
       </div>
 
-      {/* Multi-Step Form */}
       <MultiStepForm
         steps={steps}
         formData={formData}
         updateFormData={updateFormData}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        onSaveDraft={handleSaveDraft}
-        isSavingDraft={isSavingDraft}
         isSubmitting={isSubmitting}
       />
     </div>

@@ -1,7 +1,7 @@
 // app/admin/projects/[id]/edit/page.js
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import MultiStepForm from "@/components/MultiStepForm";
 import BasicInfoStep from "@/components/project-form/BasicInfoStep";
@@ -29,139 +29,127 @@ export default function EditProjectPage() {
     investorNotes: "",
   });
 
-  const fetchProject = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/admin/projects/${params.id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch project");
-      }
-      const project = await response.json();
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const response = await fetch(`/api/admin/projects/${params.id}`);
+        if (!response.ok) throw new Error("Failed to fetch project");
 
-      // Populate form with existing data
-      setFormData({
-        name: project.name || "",
-        location:
-          typeof project.location === "string"
-            ? project.location
-            : project.location?.address || project.location?.county || "",
-        totalLandSize: project.totalLandSize || "",
-        description: project.description || "",
-        status: project.status || "planning",
-        planningStartDate: project.planningStartDate || null,
-        developmentStartDate: project.developmentStartDate || null,
-        completionDate: project.completionDate || null,
-        totalPlots: project.totalPlots || "",
-        standardPlotSize: project.standardPlotSize || "",
-        paymentCompletionPeriod: project.paymentCompletionPeriod || 90,
-        investorNotes: project.investorNotes || "",
-      });
-    } catch (error) {
-      console.error("Error fetching project:", error);
-      alert("Failed to load project. Please try again.");
-      router.push("/admin/projects");
-    } finally {
-      setLoading(false);
-    }
+        const project = await response.json();
+
+        setFormData({
+          name: project.name || "",
+          location:
+            typeof project.location === "string"
+              ? project.location
+              : project.location?.address || project.location?.county || "",
+          totalLandSize: project.totalLandSize || "",
+          description: project.description || "",
+          status: project.status || "planning",
+          planningStartDate: project.planningStartDate || null,
+          developmentStartDate: project.developmentStartDate || null,
+          completionDate: project.completionDate || null,
+          totalPlots: project.totalPlots || "",
+          standardPlotSize: project.standardPlotSize || "",
+          paymentCompletionPeriod: project.paymentCompletionPeriod || 90,
+          investorNotes: project.investorNotes || "",
+        });
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        alert("Failed to load project.");
+        router.push("/admin/projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProject();
   }, [params.id, router]);
 
-  useEffect(() => {
-    fetchProject();
-  }, [fetchProject]);
+  const updateFormData = (updates) => {
+    setFormData((prev) => ({ ...prev, ...updates }));
+  };
 
+  const steps = [
+    {
+      title: "Basic Info",
+      description: "Project details",
+      component: BasicInfoStep,
+    },
+    {
+      title: "Timeline",
+      description: "Status & dates",
+      component: StatusTimelineStep,
+    },
+    {
+      title: "Plot Config",
+      description: "Plots & pricing",
+      component: PlotConfigStep,
+    },
+    {
+      title: "Purchase Terms",
+      description: "Payment settings",
+      component: PurchaseSettingsStep,
+    },
+  ];
 
-const updateFormData = (updates) => {
-  setFormData((prev) => ({ ...prev, ...updates }));
-};
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
 
-const steps = [
-  {
-    title: "Basic Info",
-    description: "Project details",
-    component: BasicInfoStep,
-  },
-  {
-    title: "Timeline",
-    description: "Status & dates",
-    component: StatusTimelineStep,
-  },
-  {
-    title: "Plot Config",
-    description: "Plots & pricing",
-    component: PlotConfigStep,
-  },
-  {
-    title: "Purchase Terms",
-    description: "Payment settings",
-    component: PurchaseSettingsStep,
-  },
-];
+    try {
+      const response = await fetch(`/api/admin/projects/${params.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-const handleSubmit = async () => {
-  setIsSubmitting(true);
+      if (!response.ok) throw new Error("Failed to update project");
 
-  try {
-    const response = await fetch(`/api/admin/projects/${params.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to update project");
+      const project = await response.json();
+      router.push(`/admin/projects/${project._id}`);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      alert(error.message || "Failed to update project.");
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    const project = await response.json();
+  const handleCancel = () => {
+    if (
+      confirm(
+        "Are you sure you want to cancel? Any unsaved changes will be lost."
+      )
+    ) {
+      router.push(`/admin/projects/${params.id}`);
+    }
+  };
 
-    // Redirect to project detail page
-    router.push(`/admin/projects/${project._id}`);
-  } catch (error) {
-    console.error("Error updating project:", error);
-    alert(error.message || "Failed to update project. Please try again.");
-  } finally {
-    setIsSubmitting(false);
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full"></div>
+      </div>
+    );
   }
-};
 
-const handleCancel = () => {
-  if (
-    confirm(
-      "Are you sure you want to cancel? Any unsaved changes will be lost."
-    )
-  ) {
-    router.push(`/admin/projects/${params.id}`);
-  }
-};
-
-if (loading) {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin w-12 h-12 border-4 border-[#5c8a75] border-t-transparent rounded-full"></div>
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Edit Project</h1>
+        <p className="text-gray-600 mt-2">
+          Update project details and settings
+        </p>
+      </div>
+
+      <MultiStepForm
+        steps={steps}
+        formData={formData}
+        updateFormData={updateFormData}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
-}
-
-return (
-  <div className="p-6 max-w-4xl mx-auto">
-    {/* Header */}
-    <div className="mb-8">
-      <h1 className="text-3xl font-bold text-gray-900">Edit Project</h1>
-      <p className="text-gray-600 mt-2">Update project details and settings</p>
-    </div>
-
-    {/* Multi-Step Form */}
-    <MultiStepForm
-      steps={steps}
-      formData={formData}
-      updateFormData={updateFormData}
-      onSubmit={handleSubmit}
-      onCancel={handleCancel}
-      onSaveDraft={handleSaveDraft}
-      isSavingDraft={isSavingDraft}
-      isSubmitting={isSubmitting}
-    />
-  </div>
-);
 }
