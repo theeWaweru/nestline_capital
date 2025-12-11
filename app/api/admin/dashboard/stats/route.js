@@ -7,6 +7,7 @@ import Plot from "@/lib/models/Plot";
 import User from "@/lib/models/User";
 import Payment from "@/lib/models/Payment";
 import Booking from "@/lib/models/Booking";
+import ContactSubmission from "@/lib/models/ContactSubmission";
 
 export async function GET(request) {
   try {
@@ -101,6 +102,16 @@ export async function GET(request) {
       status: "available",
     });
 
+    // Before the final return statement, add:
+    const recentContacts = await ContactSubmission.find()
+      .sort({ submittedAt: -1 })
+      .limit(5)
+      .lean();
+
+    const newContactsCount = await ContactSubmission.countDocuments({
+      status: "new",
+    });
+
     return NextResponse.json({
       projects: projectStats,
       plots: {
@@ -115,6 +126,10 @@ export async function GET(request) {
         pendingVerification: pendingPayments,
         verified: verifiedPayments,
         total: totalBookings,
+      },
+      contacts: {
+        recent: recentContacts,
+        new: newContactsCount,
       },
     });
   } catch (error) {

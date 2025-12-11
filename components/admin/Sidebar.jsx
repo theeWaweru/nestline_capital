@@ -13,6 +13,7 @@ import {
     UserCog,
     Settings,
     LogOut,
+    MessageSquare
 } from "lucide-react";
 
 const navigation = [
@@ -45,6 +46,12 @@ const navigation = [
         name: "Investors",
         href: "/admin/investors",
         icon: Users,
+        roles: ["admin", "editor"],
+    },
+    {
+        name: "Contacts", // NEW
+        href: "/admin/contacts",
+        icon: MessageSquare,
         roles: ["admin", "editor"],
     },
     {

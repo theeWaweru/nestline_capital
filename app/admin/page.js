@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import StatCard from "@/components/dashboard/StatCard";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import PlotStatusChart from "@/components/dashboard/PlotStatusChart";
+import RecentContacts from "@/components/dashboard/RecentContacts";
 import {
   FolderOpen,
   MapPin,
@@ -159,6 +160,10 @@ export default function AdminDashboard() {
         {/* Plot Distribution Chart - 1 column */}
         <div className="lg:col-span-1">
           <PlotStatusChart data={stats?.plots} />
+        </div>
+
+        <div className="lg:col-span-1">
+          <RecentContacts contacts={stats?.contacts?.recent || []} />
         </div>
 
         {/* Activity Feed - 2 columns */}
